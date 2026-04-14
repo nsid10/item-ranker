@@ -1,7 +1,6 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     // --- DOM Elements ---
     const gridContainer = document.getElementById("grid-container");
-    const themeToggleBtn = document.getElementById("theme-toggle");
     const downloadBtn = document.getElementById("download-btn");
     const clearAllBtn = document.getElementById("clear-all-btn");
     const addRowBtn = document.getElementById("add-row-btn");
@@ -15,26 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let totalCells = numRows * COLS;
     let gridState = Array(totalCells).fill(null);
     let draggedImageSrc = null;
-
-    // --- Theme Management ---
-    function applyTheme(theme) {
-        if (theme === "dark") {
-            document.body.classList.add("dark-mode");
-            themeToggleBtn.innerHTML = `<i class="uil uil-sun"></i>`;
-        } else {
-            document.body.classList.remove("dark-mode");
-            themeToggleBtn.innerHTML = `<i class="uil uil-moon"></i>`;
-        }
-    }
-
-    const savedTheme = localStorage.getItem("theme") || "light";
-    applyTheme(savedTheme);
-
-    themeToggleBtn.addEventListener("click", () => {
-        const newTheme = document.body.classList.contains("dark-mode") ? "light" : "dark";
-        localStorage.setItem("theme", newTheme);
-        applyTheme(newTheme);
-    });
 
     // --- Clear All Functionality ---
     clearAllBtn.addEventListener("click", () => {
@@ -243,5 +222,26 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 0; i < totalCells; i++) {
         gridContainer.appendChild(createCell(i));
     }
+
+    // --- Load Ranking Result (stored in IndexedDB by ranking page) ---
+    try {
+        const ranked = await State.largeGet("rankingResult");
+        if (Array.isArray(ranked) && ranked.length > 0) {
+            await State.largeRemove("rankingResult");
+            const neededRows = Math.min(Math.ceil(ranked.length / COLS), MAX_ROWS);
+            while (numRows < neededRows) {
+                numRows++;
+                totalCells = numRows * COLS;
+                gridState.push(...Array(COLS).fill(null));
+                for (let i = totalCells - COLS; i < totalCells; i++) {
+                    gridContainer.appendChild(createCell(i));
+                }
+            }
+            gridState = Array(totalCells).fill(null);
+            ranked.slice(0, totalCells).forEach((src, i) => { gridState[i] = src; });
+            renderGrid();
+        }
+    } catch (_) { /* IndexedDB unavailable or data corrupt — start with empty grid */ }
+
     updateRowButtons();
 });
