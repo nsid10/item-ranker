@@ -1,0 +1,189 @@
+/* --- THEME VARIABLES --- */
+:root {
+    /* Light Theme (Default) */
+    --bg-color: #f4f5f7;
+    --header-color: #333;
+    --cell-bg-color: #e9edf1;
+    --cell-number-color: #555;
+    --button-bg-color: #fff;
+    --button-text-color: #333;
+    --button-border-color: #ccc;
+    --button-bg-hover-color: #f0f0f0;
+    --drag-over-bg-color: #d0e0ff;
+    --drag-over-outline-color: #4a75d1;
+    --remove-btn-bg: rgba(0, 0, 0, 0.1);
+    --remove-btn-color: #333;
+}
+
+body.dark-mode {
+    /* Dark Theme Overrides */
+    --bg-color: #121212;
+    --header-color: #e0e0e0;
+    --cell-bg-color: #2a2c31;
+    --cell-number-color: #888;
+    --button-bg-color: #2a2c31;
+    --button-text-color: #e0e0e0;
+    --button-border-color: #444;
+    --button-bg-hover-color: #3b3e44;
+    --remove-btn-bg: rgba(255, 255, 255, 0.15);
+    --remove-btn-color: #e0e0e0;
+}
+
+/* --- GENERAL STYLES --- */
+body {
+    font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Oxygen,
+        Ubuntu,
+        Cantarell,
+        "Open Sans",
+        "Helvetica Neue",
+        sans-serif;
+    background-color: var(--bg-color);
+    color: var(--header-color); /* Default text color for the body */
+    margin: 0;
+    transition:
+        background-color 0.2s,
+        color 0.2s; /* Smooth theme transition */
+}
+
+h1 {
+    color: var(--header-color);
+    margin-top: 40px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+#grid-container {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 24px;
+    max-width: 2000px;
+    padding: 20px;
+    margin: 0 auto 40px auto;
+}
+
+.grid-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: var(--cell-bg-color);
+    border-radius: 8px;
+    aspect-ratio: 17 / 24;
+    transition: background-color 0.2s;
+}
+
+.grid-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 17 / 24;
+    order: 1;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+.cell-number {
+    order: 2;
+    font-size: 14px;
+    color: var(--cell-number-color);
+    margin-top: 4px;
+    margin-block: 4px;
+    font-weight: 700;
+    transition: color 0.2s;
+}
+
+.drag-over {
+    background-color: var(--drag-over-bg-color);
+    outline: 2px dashed var(--drag-over-outline-color);
+}
+
+.dragging {
+    opacity: 0.5;
+    border-radius: 8px;
+}
+
+/* --- CONTROLS & BUTTONS --- */
+.controls-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.controls-container button {
+    /* Make the button square to fit the icon */
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Make the icon larger */
+    font-size: 20px;
+
+    /* --- EDITED LINES --- */
+    /* Make the button's background transparent */
+    background-color: transparent;
+    /* Remove the border */
+    border: none;
+
+    /* Original styles that are still needed */
+    border-radius: 6px;
+    color: var(--button-text-color);
+    cursor: pointer;
+    transition:
+        background-color 0.2s,
+        color 0.2s;
+}
+
+.controls-container button:hover {
+    background-color: var(--button-bg-hover-color);
+}
+
+/* --- DELETE BUTTON STYLES --- */
+.grid-cell {
+    position: relative; /* Necessary for absolute positioning of the delete icon */
+}
+
+.remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: var(--remove-btn-bg);
+    color: var(--remove-btn-color);
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    font-size: 16px;
+    backdrop-filter: blur(4px); /* Adds a modern touch */
+    transition:
+        background-color 0.2s,
+        transform 0.1s;
+}
+
+.remove-btn:hover {
+    background-color: var(--button-bg-hover-color);
+    transform: scale(1.1);
+}
+
+.grid-cell:hover .remove-btn {
+    display: flex;
+}
+
+/* --- DOWNLOAD UTILITY --- */
+.hidden-for-export {
+    visibility: hidden !important;
+}
