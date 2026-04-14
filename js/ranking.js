@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (step.type === "done") {
             // Store via IndexedDB — no size limit, unlike localStorage
             await State.largeSet("rankingResult", step.result);
-            window.location.href = "./index.html";
+            window.location.href = "../index.html";
             return;
         }
         imgA.src = step.itemA;
