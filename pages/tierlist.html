@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
+        <title>Rank Grid — Tier List</title>
+        <link rel="stylesheet" href="../css/style.css" />
+        <link rel="stylesheet" href="../css/tierlist.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    </head>
+    <body>
+        <div class="controls-container">
+            <button id="theme-toggle" title="Toggle Theme">
+                <i class="uil uil-moon"></i>
+            </button>
+            <button id="download-btn" title="Download Tier List">
+                <i class="uil uil-image-download"></i>
+            </button>
+            <button id="clear-btn" title="Clear All Tiers">
+                <i class="uil uil-trash-alt"></i>
+            </button>
+            <button onclick="window.location.href='../index.html'" title="Go to Grid">
+                <i class="uil uil-apps"></i>
+            </button>
+        </div>
+
+        <h1>Tier List</h1>
+
+        <div id="tierlist-main">
+            <button class="add-tier-btn" id="add-top-btn">
+                <i class="uil uil-plus"></i> Add Tier
+            </button>
+            <div id="tier-container"></div>
+            <button class="add-tier-btn" id="add-bottom-btn">
+                <i class="uil uil-plus"></i> Add Tier
+            </button>
+        </div>
+
+        <div id="unranked-section">
+            <div id="unranked-header">
+                <span class="unranked-title">Unranked</span>
+                <button class="secondary-btn" id="upload-btn">
+                    <i class="uil uil-image-upload"></i> Add Images
+                </button>
+                <input type="file" id="file-input" accept="image/*" multiple hidden />
+            </div>
+            <div id="unranked-pool"></div>
+        </div>
+
+        <script src="../js/state.js"></script>
+        <script src="../js/theme.js"></script>
+        <script src="../js/tierlist.js"></script>
+    </body>
+</html>
