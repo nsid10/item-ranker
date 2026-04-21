@@ -13,21 +13,29 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     </head>
     <body>
+        <nav class="nav-container">
+            <button class="nav-btn active" onclick="window.location.href='./index.html'" title="Grid">
+                <i class="uil uil-apps"></i>
+                <span>Grid</span>
+            </button>
+            <button class="nav-btn" onclick="window.location.href='./pages/tierlist.html'" title="Tier List">
+                <i class="uil uil-list-ul"></i>
+                <span>Tier List</span>
+            </button>
+        </nav>
+
         <div class="controls-container">
             <button id="theme-toggle" title="Toggle Theme">
                 <i class="uil uil-moon"></i>
+            </button>
+            <button id="rank-btn" title="Start Ranking">
+                <i class="uil uil-trophy"></i>
             </button>
             <button id="download-btn" title="Download Grid">
                 <i class="uil uil-image-download"></i>
             </button>
             <button id="clear-all-btn" title="Clear All Grid">
                 <i class="uil uil-trash-alt"></i>
-            </button>
-            <button onclick="window.location.href='./pages/ranking.html'" title="Ranking Engine">
-                <i class="uil uil-trophy"></i>
-            </button>
-            <button onclick="window.location.href='./pages/tierlist.html'" title="Tier List">
-                <i class="uil uil-list-ul"></i>
             </button>
         </div>
 
@@ -43,6 +51,7 @@
         </div>
         <script src="./js/state.js"></script>
         <script src="./js/theme.js"></script>
+        <script src="./js/ranker.js"></script>
         <script src="./js/grid.js"></script>
     </body>
 </html>

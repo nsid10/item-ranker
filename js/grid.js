@@ -1,10 +1,11 @@
 document.addEventListener("DOMContentLoaded", async () => {
     // --- DOM Elements ---
     const gridContainer = document.getElementById("grid-container");
-    const downloadBtn = document.getElementById("download-btn");
-    const clearAllBtn = document.getElementById("clear-all-btn");
-    const addRowBtn = document.getElementById("add-row-btn");
-    const removeRowBtn = document.getElementById("remove-row-btn");
+    const downloadBtn   = document.getElementById("download-btn");
+    const clearAllBtn   = document.getElementById("clear-all-btn");
+    const addRowBtn     = document.getElementById("add-row-btn");
+    const removeRowBtn  = document.getElementById("remove-row-btn");
+    const rankBtn       = document.getElementById("rank-btn");
 
     // --- State & Constants ---
     const COLS = 10;
@@ -198,6 +199,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         gridState = newState;
         renderGrid();
     }
+
+    // --- Ranking ---
+    rankBtn.addEventListener("click", () => {
+        const seeded = gridState
+            .filter(src => src !== null)
+            .map(src => ({ src }));
+        if (seeded.length < 2) {
+            alert("Add at least 2 images to the grid to start ranking.");
+            return;
+        }
+        startRankingSession(seeded, async (ranked) => {
+            await State.largeSet("rankingResult", ranked.map(item => item.src));
+            window.location.reload();
+        });
+    });
 
     // --- Grid Container Fallback Drop (gaps/padding between cells) ---
     gridContainer.addEventListener("dragover", (e) => e.preventDefault());
