@@ -1,0 +1,410 @@
+/* --- UPLOAD PHASE --- */
+#upload-phase {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#upload-area {
+    width: 100%;
+    border: 2px dashed var(--button-border-color);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 32px 20px;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+#upload-area:hover,
+#upload-area.drag-over {
+    background-color: var(--drag-over-bg-color);
+    border-color: var(--drag-over-outline-color);
+}
+
+#upload-area .uil-cloud-upload {
+    font-size: 40px;
+    color: var(--cell-number-color);
+}
+
+#upload-area p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--cell-number-color);
+}
+
+#upload-area label {
+    color: var(--drag-over-outline-color);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.upload-hint {
+    font-size: 12px !important;
+    opacity: 0.6;
+}
+
+#upload-count {
+    margin: 10px 0 0;
+    font-size: 14px;
+    color: var(--cell-number-color);
+}
+
+#preview-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin: 14px 0;
+    max-width: 900px;
+}
+
+.preview-thumb {
+    position: relative;
+    width: 56px;
+    flex-shrink: 0;
+}
+
+.preview-thumb img {
+    width: 100%;
+    aspect-ratio: 17 / 24;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+}
+
+.preview-remove-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--remove-btn-bg);
+    color: var(--remove-btn-color);
+    font-size: 10px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    backdrop-filter: blur(4px);
+}
+
+.preview-thumb:hover .preview-remove-btn {
+    display: flex;
+}
+
+/* --- SHARED BUTTONS --- */
+.tourn-primary-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    font-size: 15px;
+    background-color: var(--drag-over-outline-color);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: opacity 0.2s;
+}
+
+.tourn-primary-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.tourn-primary-btn:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+.tourn-outline-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    font-size: 15px;
+    background-color: transparent;
+    color: var(--button-text-color);
+    border: 1px solid var(--button-border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: background-color 0.2s;
+}
+
+.tourn-outline-btn:hover {
+    background-color: var(--button-bg-hover-color);
+}
+
+/* --- MATCH PHASE --- */
+#match-phase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+#round-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--drag-over-outline-color);
+    margin: 0 0 4px;
+}
+
+#match-label {
+    font-size: 14px;
+    color: var(--cell-number-color);
+    margin: 0 0 4px;
+    min-height: 20px;
+}
+
+.pick-hint {
+    font-size: 13px;
+    color: var(--cell-number-color);
+    opacity: 0.7;
+    margin: 0 0 24px;
+}
+
+#match-container {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    width: 100%;
+    max-width: 720px;
+}
+
+.match-side {
+    flex: 1;
+    cursor: pointer;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.match-side:hover {
+    transform: scale(1.03);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.match-side img {
+    width: 100%;
+    aspect-ratio: 17 / 24;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+}
+
+.match-side.winner-flash {
+    outline: 4px solid var(--drag-over-outline-color);
+    transform: scale(1.03);
+}
+
+#vs-label {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--cell-number-color);
+    flex-shrink: 0;
+    user-select: none;
+}
+
+#view-bracket-btn {
+    margin-top: 28px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px;
+    background: transparent;
+    border: 1px solid var(--button-border-color);
+    border-radius: 6px;
+    color: var(--cell-number-color);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+#view-bracket-btn:hover {
+    background-color: var(--button-bg-hover-color);
+    border-color: var(--button-text-color);
+    color: var(--button-text-color);
+}
+
+/* --- CHAMPION --- */
+#champion-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px;
+}
+
+#champion-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--drag-over-outline-color);
+    margin: 0 0 24px;
+    letter-spacing: 0.05em;
+}
+
+#champion-card {
+    width: 220px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+#champion-card img {
+    width: 100%;
+    aspect-ratio: 17 / 24;
+    object-fit: cover;
+    display: block;
+}
+
+#champion-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* --- BRACKET MODAL --- */
+#bracket-modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#bracket-modal.hidden {
+    display: none;
+}
+
+#bracket-modal-inner {
+    background-color: var(--bg-color);
+    border-radius: 16px;
+    width: min(92vw, 1100px);
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#bracket-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--button-border-color);
+    flex-shrink: 0;
+}
+
+#bracket-modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--header-color);
+}
+
+#close-bracket-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    color: var(--cell-number-color);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s;
+}
+
+#close-bracket-btn:hover {
+    background-color: var(--button-bg-hover-color);
+}
+
+#bracket-scroll {
+    overflow: auto;
+    flex: 1;
+    padding: 24px;
+}
+
+#bracket-view {
+    display: inline-block;
+    min-width: 100%;
+}
+
+#bracket-modal-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--button-border-color);
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+#bracket-modal-footer .tourn-primary-btn {
+    margin-top: 0;
+}
+
+/* --- BRACKET ENTRIES --- */
+.b-match {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px;
+    border-radius: 6px;
+    background-color: var(--cell-bg-color);
+    border: 1px solid var(--button-border-color);
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+}
+
+.b-match--current {
+    border-color: var(--drag-over-outline-color);
+    box-shadow: 0 0 0 2px var(--drag-over-outline-color);
+}
+
+.b-entry {
+    height: 44px;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: var(--bg-color);
+    border: 1px solid var(--button-border-color);
+    display: flex;
+    align-items: center;
+}
+
+.b-entry img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.b-entry--winner {
+    border-color: var(--drag-over-outline-color);
+    outline: 2px solid var(--drag-over-outline-color);
+}
+
+.b-entry--bye {
+    font-size: 11px;
+    color: var(--cell-number-color);
+    opacity: 0.4;
+    justify-content: center;
+    font-style: italic;
+}

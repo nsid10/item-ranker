@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
-        <title>Rank Grid — Ranking Engine</title>
+        <title>Rank Grid — Ranking</title>
         <link rel="stylesheet" href="../css/style.css" />
         <link rel="stylesheet" href="../css/ranking.css" />
     </head>
@@ -14,13 +14,13 @@
                 <i class="uil uil-apps"></i>
                 <span>Grid</span>
             </button>
-            <button class="nav-btn active" onclick="window.location.href='./ranking.html'" title="Ranking Engine">
-                <i class="uil uil-trophy"></i>
-                <span>Ranking</span>
-            </button>
             <button class="nav-btn" onclick="window.location.href='./tierlist.html'" title="Tier List">
                 <i class="uil uil-list-ul"></i>
                 <span>Tier List</span>
+            </button>
+            <button class="nav-btn" onclick="window.location.href='./tournament.html'" title="Tournament">
+                <i class="uil uil-shield"></i>
+                <span>Tournament</span>
             </button>
         </nav>
 
@@ -30,28 +30,12 @@
             </button>
         </div>
 
-        <!-- Phase 1: Upload -->
-        <div id="upload-phase">
-            <h1>Ranking Engine</h1>
-            <div id="upload-area">
-                <i class="uil uil-cloud-upload"></i>
-                <p>Drop images here or <label for="file-input">browse</label></p>
-                <p class="upload-hint">Up to 100 images</p>
-                <input type="file" id="file-input" accept="image/*" multiple />
-            </div>
-            <p id="upload-count" class="hidden">0 / 100 images</p>
-            <div id="preview-grid"></div>
-            <button id="start-ranking-btn" class="primary-btn" disabled>
-                <i class="uil uil-play"></i> Start Ranking
-            </button>
-        </div>
-
-        <!-- Phase 2: Head-to-head -->
-        <div id="ranking-phase" class="phase hidden">
+        <div id="ranking-ui">
+            <p id="match-phase"></p>
             <p id="match-progress">
                 Match <span id="match-num">1</span> / ~<span id="match-est">?</span>
             </p>
-            <p class="pick-hint">Click the winner</p>
+            <p class="pick-hint">Click the better item</p>
             <div id="match-container">
                 <div class="match-side" id="side-a">
                     <img id="img-a" alt="Option A" />
@@ -61,10 +45,12 @@
                     <img id="img-b" alt="Option B" />
                 </div>
             </div>
+            <button id="end-early-btn">End Early &amp; Use Current Rankings</button>
         </div>
 
         <script src="../js/state.js"></script>
         <script src="../js/theme.js"></script>
+        <script src="../js/ranker.js"></script>
         <script src="../js/ranking.js"></script>
     </body>
 </html>

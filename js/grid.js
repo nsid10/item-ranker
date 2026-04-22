@@ -209,9 +209,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("Add at least 2 images to the grid to start ranking.");
             return;
         }
-        startRankingSession(seeded, async (ranked) => {
-            await State.largeSet("rankingResult", ranked.map(item => item.src));
-            window.location.reload();
+        showRankingConfirm(seeded.length, async () => {
+            await State.largeSet("rankingSeeds", seeded);
+            window.location.href = "./pages/ranking.html";
         });
     });
 

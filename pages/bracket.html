@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
+        <title>Rank Grid — Tournament</title>
+        <link rel="stylesheet" href="../css/style.css" />
+        <link rel="stylesheet" href="../css/tournament.css" />
+    </head>
+    <body>
+        <nav class="nav-container">
+            <button class="nav-btn" onclick="window.location.href='../index.html'" title="Grid">
+                <i class="uil uil-apps"></i>
+                <span>Grid</span>
+            </button>
+            <button class="nav-btn" onclick="window.location.href='./tierlist.html'" title="Tier List">
+                <i class="uil uil-list-ul"></i>
+                <span>Tier List</span>
+            </button>
+            <button class="nav-btn active" onclick="window.location.href='./tournament.html'" title="Tournament">
+                <i class="uil uil-shield"></i>
+                <span>Tournament</span>
+            </button>
+        </nav>
+
+        <div class="controls-container">
+            <button id="theme-toggle" title="Toggle Theme">
+                <i class="uil uil-moon"></i>
+            </button>
+        </div>
+
+        <!-- Phase 1: Upload -->
+        <div id="upload-phase">
+            <h1>Tournament</h1>
+            <div id="upload-area">
+                <i class="uil uil-cloud-upload"></i>
+                <p>Drop images here or <label for="file-input">browse</label></p>
+                <p class="upload-hint">2 – 64 images</p>
+                <input type="file" id="file-input" accept="image/*" multiple hidden />
+            </div>
+            <p id="upload-count" class="hidden"></p>
+            <div id="preview-grid"></div>
+            <button id="start-btn" class="tourn-primary-btn" disabled>
+                <i class="uil uil-play"></i> Start Tournament
+            </button>
+        </div>
+
+        <!-- Phase 2: Head-to-head -->
+        <div id="match-phase" class="hidden">
+            <p id="round-label"></p>
+            <p id="match-label"></p>
+            <p class="pick-hint">Click the winner</p>
+            <div id="match-container">
+                <div class="match-side" id="side-a">
+                    <img id="img-a" alt="Option A" />
+                </div>
+                <div id="vs-label">VS</div>
+                <div class="match-side" id="side-b">
+                    <img id="img-b" alt="Option B" />
+                </div>
+            </div>
+            <button id="view-bracket-btn">
+                <i class="uil uil-sitemap"></i> View Bracket
+            </button>
+        </div>
+
+        <!-- Phase 3: Champion -->
+        <div id="champion-section" class="hidden">
+            <h2 id="champion-title">Champion!</h2>
+            <div id="champion-card">
+                <img id="champion-img" alt="Champion" />
+            </div>
+            <div id="champion-actions">
+                <button id="view-final-bracket-btn" class="tourn-outline-btn">
+                    <i class="uil uil-sitemap"></i> View Bracket
+                </button>
+                <button id="new-tournament-btn" class="tourn-primary-btn">
+                    <i class="uil uil-redo"></i> New Tournament
+                </button>
+            </div>
+        </div>
+
+        <!-- Bracket Modal -->
+        <div id="bracket-modal" class="hidden">
+            <div id="bracket-modal-inner">
+                <div id="bracket-modal-header">
+                    <span id="bracket-modal-title">Tournament Bracket</span>
+                    <button id="close-bracket-btn"><i class="uil uil-times"></i></button>
+                </div>
+                <div id="bracket-scroll">
+                    <div id="bracket-view"></div>
+                </div>
+                <div id="bracket-modal-footer" class="hidden">
+                    <button id="resume-btn" class="tourn-primary-btn">
+                        <i class="uil uil-play"></i> Resume Match
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="../js/state.js"></script>
+        <script src="../js/theme.js"></script>
+        <script src="../js/tournament.js"></script>
+    </body>
+</html>

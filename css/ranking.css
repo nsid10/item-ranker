@@ -1,145 +1,18 @@
-/* --- UPLOAD PHASE --- */
-#upload-phase {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
+/* --- RANKING UI --- */
+#ranking-ui {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 40px 20px 40px;
 }
 
-#upload-area {
-    width: 100%;
-    min-height: 160px;
-    border: 2px dashed var(--button-border-color);
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 32px 20px;
-    box-sizing: border-box;
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
-}
-
-#upload-area:hover,
-#upload-area.drag-over {
-    background-color: var(--drag-over-bg-color);
-    border-color: var(--drag-over-outline-color);
-}
-
-#upload-area .uil-cloud-upload {
-    font-size: 48px;
-    color: var(--cell-number-color);
-}
-
-#upload-area p {
-    margin: 0;
-    color: var(--cell-number-color);
-    font-size: 15px;
-}
-
-#upload-area label {
+#match-phase {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     color: var(--drag-over-outline-color);
-    cursor: pointer;
-    text-decoration: underline;
-}
-
-.upload-hint {
-    font-size: 13px !important;
-    opacity: 0.6;
-}
-
-#file-input {
-    display: none;
-}
-
-#upload-count {
-    margin: 10px 0 0;
-    font-size: 14px;
-    color: var(--cell-number-color);
-}
-
-/* --- PREVIEW GRID --- */
-#preview-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
-    margin: 14px 0;
-    max-width: 900px;
-}
-
-.preview-thumb {
-    position: relative;
-    width: 56px;
-    flex-shrink: 0;
-}
-
-.preview-thumb img {
-    width: 100%;
-    aspect-ratio: 17 / 24;
-    object-fit: cover;
-    border-radius: 4px;
-    display: block;
-}
-
-.preview-remove-btn {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    border: none;
-    background-color: var(--remove-btn-bg);
-    color: var(--remove-btn-color);
-    font-size: 10px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0;
-    backdrop-filter: blur(4px);
-}
-
-.preview-thumb:hover .preview-remove-btn {
-    display: flex;
-}
-
-/* --- PRIMARY BUTTON --- */
-.primary-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 24px;
-    font-size: 16px;
-    background-color: var(--drag-over-outline-color);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 16px;
-    transition: opacity 0.2s;
-}
-
-.primary-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-.primary-btn:hover:not(:disabled) {
-    opacity: 0.85;
-}
-
-/* --- RANKING PHASE --- */
-.phase {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 20px 20px;
+    margin: 0 0 4px;
 }
 
 #match-progress {
@@ -197,7 +70,20 @@
     user-select: none;
 }
 
-/* --- UTILITY --- */
-.hidden {
-    display: none !important;
+#end-early-btn {
+    margin-top: 28px;
+    padding: 8px 20px;
+    background-color: transparent;
+    border: 1px solid var(--button-border-color);
+    border-radius: 6px;
+    color: var(--cell-number-color);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+#end-early-btn:hover {
+    background-color: var(--button-bg-hover-color);
+    border-color: var(--button-text-color);
+    color: var(--button-text-color);
 }

@@ -265,106 +265,75 @@ h1 {
     visibility: hidden !important;
 }
 
-/* --- RANKING OVERLAY --- */
-#ranking-overlay {
+/* --- RANKING CONFIRMATION POPUP --- */
+#rank-confirm-overlay {
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.87);
+    background-color: rgba(0, 0, 0, 0.6);
     z-index: 500;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-#ranking-modal {
+#rank-confirm-modal {
     background-color: var(--bg-color);
-    border-radius: 16px;
-    padding: 32px 40px;
-    max-width: 860px;
+    border-radius: 12px;
+    padding: 28px 32px;
+    max-width: 380px;
     width: 90vw;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
-#ranking-phase-label {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--drag-over-outline-color);
-}
-
-#ranking-progress {
-    font-size: 14px;
-    color: var(--cell-number-color);
+#rank-confirm-modal h2 {
     margin: 0;
-}
-
-#ranking-hint {
-    font-size: 14px;
-    color: var(--cell-number-color);
-    margin: 0;
-}
-
-#ranking-match {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-    margin: 8px 0;
-}
-
-.ranking-side {
-    width: 240px;
-    aspect-ratio: 17 / 24;
-    border-radius: 8px;
-    overflow: hidden;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.ranking-side:hover {
-    transform: scale(1.03);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-
-.ranking-side img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    pointer-events: none;
-    user-select: none;
-    display: block;
-}
-
-.ranking-winner-flash {
-    outline: 4px solid var(--drag-over-outline-color);
-    outline-offset: 2px;
-}
-
-#ranking-vs {
-    font-size: 28px;
-    font-weight: 900;
+    font-size: 20px;
     color: var(--header-color);
-    flex-shrink: 0;
 }
 
-#ranking-end-early {
-    margin-top: 6px;
-    padding: 8px 20px;
-    background-color: transparent;
+#rank-confirm-modal p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--cell-number-color);
+    line-height: 1.6;
+}
+
+#rank-confirm-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+#rank-confirm-cancel {
+    padding: 8px 16px;
+    background: transparent;
     border: 1px solid var(--button-border-color);
     border-radius: 6px;
     color: var(--cell-number-color);
-    font-size: 13px;
+    font-size: 14px;
     cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    transition: background-color 0.2s;
 }
 
-#ranking-end-early:hover {
+#rank-confirm-cancel:hover {
     background-color: var(--button-bg-hover-color);
-    border-color: var(--button-text-color);
-    color: var(--button-text-color);
+}
+
+#rank-confirm-start {
+    padding: 8px 20px;
+    background-color: var(--drag-over-outline-color);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+#rank-confirm-start:hover {
+    opacity: 0.85;
 }

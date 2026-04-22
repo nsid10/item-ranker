@@ -36,13 +36,18 @@ class TournamentRanker {
     }
 
     // Best-effort ordered result from current state (used for End Early).
+    // Seed order (original position) is always used as the tiebreaker, so
+    // ending immediately returns the original seed order unchanged.
     getPartialResult() {
         if (this.phase === "swiss") {
+            // Sort by wins desc; ties broken by original seed position (lower = better).
             return Array.from({ length: this.n }, (_, i) => i)
                 .sort((a, b) => this.scores[b] - this.scores[a] || a - b)
                 .map(i => this.items[i]);
         }
         // Merge sort: flatten what we know in order.
+        // Each sublist in the queue is internally sorted; seed-order tiebreaking was
+        // applied when building the initial queue from Swiss results.
         const out = [];
         if (this.mergeCurrentMerge) {
             const m = this.mergeCurrentMerge;
@@ -138,71 +143,29 @@ class TournamentRanker {
     }
 }
 
-// Injects a full-screen ranking overlay and runs the tournament.
-// items:  [{src, ...}] in seed order (best seed first)
-// onDone: function(rankedItems) called with final or partial result
-function startRankingSession(items, onDone) {
+// Shows a confirmation popup before starting a ranking session.
+// itemCount: number of items to be ranked
+// onConfirm: called when the user clicks Start
+function showRankingConfirm(itemCount, onConfirm) {
     const overlay = document.createElement("div");
-    overlay.id = "ranking-overlay";
+    overlay.id = "rank-confirm-overlay";
     overlay.innerHTML = `
-        <div id="ranking-modal">
-            <div id="ranking-phase-label"></div>
-            <p id="ranking-progress"></p>
-            <p id="ranking-hint">Click the better item</p>
-            <div id="ranking-match">
-                <div class="ranking-side" id="rank-side-a">
-                    <img id="rank-img-a" draggable="false" />
-                </div>
-                <div id="ranking-vs">VS</div>
-                <div class="ranking-side" id="rank-side-b">
-                    <img id="rank-img-b" draggable="false" />
-                </div>
+        <div id="rank-confirm-modal">
+            <h2>Start Ranking</h2>
+            <p>Run a head-to-head tournament to rank all ${itemCount} items.<br>
+               You can end early at any time and keep the results up to that point.</p>
+            <div id="rank-confirm-buttons">
+                <button id="rank-confirm-cancel">Cancel</button>
+                <button id="rank-confirm-start">Start</button>
             </div>
-            <button id="ranking-end-early">End Early &amp; Use Current Rankings</button>
         </div>
     `;
     document.body.appendChild(overlay);
 
-    const phaseLabel  = overlay.querySelector("#ranking-phase-label");
-    const progressEl  = overlay.querySelector("#ranking-progress");
-    const imgA        = overlay.querySelector("#rank-img-a");
-    const imgB        = overlay.querySelector("#rank-img-b");
-    const sideA       = overlay.querySelector("#rank-side-a");
-    const sideB       = overlay.querySelector("#rank-side-b");
-    const endEarlyBtn = overlay.querySelector("#ranking-end-early");
-
-    const ranker = new TournamentRanker(items);
-
-    function applyStep(step) {
-        if (step.type === "done") {
-            overlay.remove();
-            onDone(step.result);
-            return;
-        }
-        phaseLabel.textContent  = step.phase;
-        progressEl.textContent  = `Match ${ranker.matchCount + 1} / ~${ranker.estimatedTotal}`;
-        imgA.src = step.itemA.src;
-        imgB.src = step.itemB.src;
-    }
-
-    function pickAndAdvance(side) {
-        const el = side === "A" ? sideA : sideB;
-        el.classList.add("ranking-winner-flash");
-        setTimeout(() => {
-            el.classList.remove("ranking-winner-flash");
-            applyStep(ranker.pickWinner(side));
-        }, 150);
-    }
-
-    sideA.addEventListener("click", () => pickAndAdvance("A"));
-    sideB.addEventListener("click", () => pickAndAdvance("B"));
-
-    endEarlyBtn.addEventListener("click", () => {
-        if (confirm("End ranking early? Results will be based on matches completed so far.")) {
-            overlay.remove();
-            onDone(ranker.getPartialResult());
-        }
+    overlay.querySelector("#rank-confirm-cancel").addEventListener("click", () => overlay.remove());
+    overlay.querySelector("#rank-confirm-start").addEventListener("click", () => {
+        overlay.remove();
+        onConfirm();
     });
-
-    applyStep(ranker.start());
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
 }

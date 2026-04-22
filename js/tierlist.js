@@ -332,9 +332,9 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Add at least 2 images to start ranking.");
             return;
         }
-        startRankingSession(seeded, async (ranked) => {
-            await State.largeSet("rankingResult", ranked.map(item => item.src));
-            window.location.href = "../index.html";
+        showRankingConfirm(seeded.length, async () => {
+            await State.largeSet("rankingSeeds", seeded);
+            window.location.href = "./ranking.html";
         });
     });
 
