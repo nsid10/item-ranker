@@ -4,9 +4,10 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
-        <title>Rank Grid — Tournament</title>
+        <title>Rank Grid — Bracket</title>
         <link rel="stylesheet" href="../css/style.css" />
-        <link rel="stylesheet" href="../css/tournament.css" />
+        <link rel="stylesheet" href="../css/bracket.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     </head>
     <body>
         <nav class="nav-container">
@@ -18,9 +19,9 @@
                 <i class="uil uil-list-ul"></i>
                 <span>Tier List</span>
             </button>
-            <button class="nav-btn active" onclick="window.location.href='./tournament.html'" title="Tournament">
+            <button class="nav-btn active" onclick="window.location.href='./bracket.html'" title="Bracket">
                 <i class="uil uil-shield"></i>
-                <span>Tournament</span>
+                <span>Bracket</span>
             </button>
         </nav>
 
@@ -28,11 +29,17 @@
             <button id="theme-toggle" title="Toggle Theme">
                 <i class="uil uil-moon"></i>
             </button>
+            <button id="download-btn" title="Download Bracket" disabled>
+                <i class="uil uil-image-download"></i>
+            </button>
+            <button id="clear-btn" title="Clear Bracket" disabled>
+                <i class="uil uil-trash-alt"></i>
+            </button>
         </div>
 
         <!-- Phase 1: Upload -->
         <div id="upload-phase">
-            <h1>Tournament</h1>
+            <h1>Bracket</h1>
             <div id="upload-area">
                 <i class="uil uil-cloud-upload"></i>
                 <p>Drop images here or <label for="file-input">browse</label></p>
@@ -42,7 +49,7 @@
             <p id="upload-count" class="hidden"></p>
             <div id="preview-grid"></div>
             <button id="start-btn" class="tourn-primary-btn" disabled>
-                <i class="uil uil-play"></i> Start Tournament
+                <i class="uil uil-play"></i> Start Bracket
             </button>
         </div>
 
@@ -75,8 +82,8 @@
                 <button id="view-final-bracket-btn" class="tourn-outline-btn">
                     <i class="uil uil-sitemap"></i> View Bracket
                 </button>
-                <button id="new-tournament-btn" class="tourn-primary-btn">
-                    <i class="uil uil-redo"></i> New Tournament
+                <button id="new-bracket-btn" class="tourn-primary-btn">
+                    <i class="uil uil-redo"></i> New Bracket
                 </button>
             </div>
         </div>
@@ -85,7 +92,7 @@
         <div id="bracket-modal" class="hidden">
             <div id="bracket-modal-inner">
                 <div id="bracket-modal-header">
-                    <span id="bracket-modal-title">Tournament Bracket</span>
+                    <span id="bracket-modal-title">Bracket</span>
                     <button id="close-bracket-btn"><i class="uil uil-times"></i></button>
                 </div>
                 <div id="bracket-scroll">
@@ -101,6 +108,6 @@
 
         <script src="../js/state.js"></script>
         <script src="../js/theme.js"></script>
-        <script src="../js/tournament.js"></script>
+        <script src="../js/bracket.js"></script>
     </body>
 </html>

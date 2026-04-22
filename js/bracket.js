@@ -1,4 +1,4 @@
-// --- Tournament engine ---
+// --- Bracket engine ---
 
 function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -11,25 +11,38 @@ function shuffle(arr) {
 class Tournament {
     constructor(items) {
         const shuffled = shuffle([...items]);
-        // Pad to the next power of 2 with nulls (byes).
         const size = 1 << Math.ceil(Math.log2(Math.max(shuffled.length, 2)));
-        while (shuffled.length < size) shuffled.push(null);
 
         this.size = size;
         this.allMatches = {};
-        this.rounds = this._build(shuffled);
+        // Distribute byes so each item gets at most one, and no null-vs-null match exists.
+        this.rounds = this._build(this._buildSlots(shuffled, size));
         this._resolveByes();
         this.currentMatchId = this._nextPending();
         this.champion = null;
     }
 
-    _build(items) {
+    // Place bye matches at the front (one real item + one null each).
+    // Remaining slots are filled with two real items per match.
+    // This guarantees no null-vs-null pair and no item gets more than one bye.
+    _buildSlots(items, size) {
+        const byes = size - items.length;
+        const slots = [];
+        let ii = 0;
+        for (let pair = 0; pair < size / 2; pair++) {
+            if (pair < byes) slots.push(items[ii++], null);
+            else             slots.push(items[ii++], items[ii++]);
+        }
+        return slots;
+    }
+
+    _build(slots) {
         const rounds = [];
         let id = 0;
 
         const r0 = [];
-        for (let i = 0; i < items.length; i += 2) {
-            const m = { id: id++, round: 0, slot: i / 2, itemA: items[i], itemB: items[i + 1], winner: null, feederA: null, feederB: null };
+        for (let i = 0; i < slots.length; i += 2) {
+            const m = { id: id++, round: 0, slot: i / 2, itemA: slots[i], itemB: slots[i + 1], winner: null, feederA: null, feederB: null };
             r0.push(m);
             this.allMatches[m.id] = m;
         }
@@ -49,6 +62,8 @@ class Tournament {
         return rounds;
     }
 
+    // Only round-0 byes are resolved here. _win() does NOT cascade further,
+    // so a bye in round 0 can never cascade into a second bye in round 1.
     _resolveByes() {
         this.rounds[0].forEach(m => {
             if (m.itemA && !m.itemB) this._win(m, m.itemA);
@@ -60,15 +75,11 @@ class Tournament {
         match.winner = winner;
         const parent = Object.values(this.allMatches)
             .find(m => m.feederA === match.id || m.feederB === match.id);
-        if (!parent) {
-            this.champion = winner;
-            return;
-        }
+        if (!parent) { this.champion = winner; return; }
         if (parent.feederA === match.id) parent.itemA = winner;
         else parent.itemB = winner;
-        // Auto-advance byes that cascade
-        if (parent.itemA && !parent.itemB) this._win(parent, parent.itemA);
-        else if (!parent.itemA && parent.itemB) this._win(parent, parent.itemB);
+        // Do NOT auto-cascade: a null slot in the parent means the other feeder
+        // hasn't been played yet, not that it's a permanent bye.
     }
 
     pickWinner(matchId, winner) {
@@ -98,7 +109,7 @@ const MATCH_PAD = 6;
 const MATCH_H  = 2 * ENTRY_H + ENTRY_GAP + 2 * MATCH_PAD; // 102px
 const MATCH_W  = 150;
 const ROUND_GAP = 52;
-const SLOT_H   = 64; // must be > MATCH_H/2 so matches don't overlap
+const SLOT_H   = 64;
 
 function matchCenterY(match, tournament) {
     const n = tournament.rounds[match.round].length;
@@ -106,8 +117,18 @@ function matchCenterY(match, tournament) {
     return (match.slot * slotsPerMatch + slotsPerMatch / 2) * SLOT_H;
 }
 
+// Resolve CSS custom properties to actual color values so SVG attributes work
+// correctly (SVG stroke= attributes don't support var(--...) syntax).
+function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
 function renderBracket(tournament, container, currentMatchId) {
     container.innerHTML = "";
+
+    const colorActive  = cssVar("--drag-over-outline-color");
+    const colorBorder  = cssVar("--button-border-color");
+    const colorPending = cssVar("--cell-bg-color");
 
     const numRounds = tournament.rounds.length;
     const totalW = numRounds * (MATCH_W + ROUND_GAP) - ROUND_GAP;
@@ -116,40 +137,42 @@ function renderBracket(tournament, container, currentMatchId) {
     const wrap = document.createElement("div");
     wrap.style.cssText = `position:relative;width:${totalW}px;height:${totalH}px;flex-shrink:0;`;
 
-    // SVG for connecting lines
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", totalW);
     svg.setAttribute("height", totalH);
     svg.style.cssText = "position:absolute;inset:0;pointer-events:none;overflow:visible;";
 
-    // Render matches as DOM elements
     tournament.rounds.forEach((round, ri) => {
         round.forEach(match => {
-            const cy = matchCenterY(match, tournament);
-            const top = cy - MATCH_H / 2;
+            const cy   = matchCenterY(match, tournament);
+            const top  = cy - MATCH_H / 2;
             const left = ri * (MATCH_W + ROUND_GAP);
 
             const card = document.createElement("div");
             card.classList.add("b-match");
             if (match.id === currentMatchId) card.classList.add("b-match--current");
-            if (match.winner) card.classList.add("b-match--done");
             card.style.cssText = `position:absolute;top:${top}px;left:${left}px;width:${MATCH_W}px;`;
 
             card.appendChild(makeEntry(match.itemA, match.winner === match.itemA && match.winner != null));
             card.appendChild(makeEntry(match.itemB, match.winner === match.itemB && match.winner != null));
             wrap.appendChild(card);
 
-            // Draw connector from this match to its parent
+            // Connector line from this match to its parent match
             if (ri < numRounds - 1) {
                 const parent = Object.values(tournament.allMatches)
                     .find(m => m.feederA === match.id || m.feederB === match.id);
                 if (parent) {
                     const parentCY = matchCenterY(parent, tournament);
-                    const x1 = left + MATCH_W;
+                    const x1   = left + MATCH_W;
                     const xMid = x1 + ROUND_GAP / 2;
-                    const x2 = (ri + 1) * (MATCH_W + ROUND_GAP);
-                    const color = match.winner ? "var(--drag-over-outline-color)" : "var(--button-border-color)";
-                    drawConnector(svg, x1, cy, xMid, cy, xMid, parentCY, x2, parentCY, color);
+                    const x2   = (ri + 1) * (MATCH_W + ROUND_GAP);
+                    const color = match.winner ? colorActive : colorBorder;
+                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    path.setAttribute("d", `M${x1},${cy} H${xMid} V${parentCY} H${x2}`);
+                    path.setAttribute("fill", "none");
+                    path.setAttribute("stroke", color);
+                    path.setAttribute("stroke-width", "2");
+                    svg.appendChild(path);
                 }
             }
         });
@@ -171,51 +194,41 @@ function makeEntry(item, isWinner) {
     return el;
 }
 
-function drawConnector(svg, x1, y1, xMid, yMid1, xMid2, yMid2, x2, y2, color) {
-    // Draws: right from match → mid column → vertical → to parent
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    const d = `M${x1},${y1} H${xMid} V${y2} H${x2}`;
-    path.setAttribute("d", d);
-    path.setAttribute("fill", "none");
-    path.setAttribute("stroke", color);
-    path.setAttribute("stroke-width", "2");
-    svg.appendChild(path);
-}
-
 // --- Page logic ---
 
 document.addEventListener("DOMContentLoaded", () => {
     const MAX_IMAGES = 64;
     let uploadedItems = [];
-    let tournament = null;
+    let tournament    = null;
 
-    // DOM references
-    const uploadPhase      = document.getElementById("upload-phase");
-    const matchPhase       = document.getElementById("match-phase");
-    const championSection  = document.getElementById("champion-section");
-    const uploadArea       = document.getElementById("upload-area");
-    const fileInput        = document.getElementById("file-input");
-    const previewGrid      = document.getElementById("preview-grid");
-    const uploadCountEl    = document.getElementById("upload-count");
-    const startBtn         = document.getElementById("start-btn");
+    const uploadPhase     = document.getElementById("upload-phase");
+    const matchPhase      = document.getElementById("match-phase");
+    const championSection = document.getElementById("champion-section");
+    const uploadArea      = document.getElementById("upload-area");
+    const fileInput       = document.getElementById("file-input");
+    const previewGrid     = document.getElementById("preview-grid");
+    const uploadCountEl   = document.getElementById("upload-count");
+    const startBtn        = document.getElementById("start-btn");
+    const downloadBtn     = document.getElementById("download-btn");
+    const clearBtn        = document.getElementById("clear-btn");
 
-    const roundLabel       = document.getElementById("round-label");
-    const matchLabel       = document.getElementById("match-label");
-    const imgA             = document.getElementById("img-a");
-    const imgB             = document.getElementById("img-b");
-    const sideA            = document.getElementById("side-a");
-    const sideB            = document.getElementById("side-b");
-    const viewBracketBtn   = document.getElementById("view-bracket-btn");
+    const roundLabel      = document.getElementById("round-label");
+    const matchLabel      = document.getElementById("match-label");
+    const imgA            = document.getElementById("img-a");
+    const imgB            = document.getElementById("img-b");
+    const sideA           = document.getElementById("side-a");
+    const sideB           = document.getElementById("side-b");
+    const viewBracketBtn  = document.getElementById("view-bracket-btn");
 
-    const championImg      = document.getElementById("champion-img");
-    const viewFinalBtn     = document.getElementById("view-final-bracket-btn");
-    const newTournamentBtn = document.getElementById("new-tournament-btn");
+    const championImg     = document.getElementById("champion-img");
+    const viewFinalBtn    = document.getElementById("view-final-bracket-btn");
+    const newBracketBtn   = document.getElementById("new-bracket-btn");
 
-    const bracketModal     = document.getElementById("bracket-modal");
-    const closeBracketBtn  = document.getElementById("close-bracket-btn");
-    const bracketView      = document.getElementById("bracket-view");
-    const bracketFooter    = document.getElementById("bracket-modal-footer");
-    const resumeBtn        = document.getElementById("resume-btn");
+    const bracketModal    = document.getElementById("bracket-modal");
+    const closeBracketBtn = document.getElementById("close-bracket-btn");
+    const bracketView     = document.getElementById("bracket-view");
+    const bracketFooter   = document.getElementById("bracket-modal-footer");
+    const resumeBtn       = document.getElementById("resume-btn");
 
     // --- Upload ---
     function updateUploadUI() {
@@ -262,16 +275,18 @@ document.addEventListener("DOMContentLoaded", () => {
         previewGrid.appendChild(thumb);
     }
 
-    uploadArea.addEventListener("click", (e) => { if (e.target !== fileInput) fileInput.click(); });
-    fileInput.addEventListener("change", () => { addImages(fileInput.files); fileInput.value = ""; });
+    uploadArea.addEventListener("click",    (e) => { if (e.target !== fileInput) fileInput.click(); });
+    fileInput.addEventListener("change",    ()  => { addImages(fileInput.files); fileInput.value = ""; });
     uploadArea.addEventListener("dragover", (e) => { e.preventDefault(); uploadArea.classList.add("drag-over"); });
-    uploadArea.addEventListener("dragleave", (e) => { if (!uploadArea.contains(e.relatedTarget)) uploadArea.classList.remove("drag-over"); });
-    uploadArea.addEventListener("drop", (e) => { e.preventDefault(); uploadArea.classList.remove("drag-over"); addImages(e.dataTransfer.files); });
+    uploadArea.addEventListener("dragleave",(e) => { if (!uploadArea.contains(e.relatedTarget)) uploadArea.classList.remove("drag-over"); });
+    uploadArea.addEventListener("drop",     (e) => { e.preventDefault(); uploadArea.classList.remove("drag-over"); addImages(e.dataTransfer.files); });
 
     startBtn.addEventListener("click", () => {
         tournament = new Tournament(uploadedItems);
         uploadPhase.classList.add("hidden");
         matchPhase.classList.remove("hidden");
+        downloadBtn.disabled = false;
+        clearBtn.disabled    = false;
         showCurrentMatch();
     });
 
@@ -280,23 +295,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const match = tournament.currentMatch;
         if (!match) { showChampion(); return; }
 
-        const r          = match.round;
-        const numRounds  = tournament.rounds.length;
+        const r            = match.round;
+        const numRounds    = tournament.rounds.length;
         const roundMatches = tournament.rounds[r].filter(m => m.itemA && m.itemB);
         const doneInRound  = roundMatches.filter(m => m.winner).length;
         const totalInRound = roundMatches.length;
 
-        if (r === numRounds - 1) {
-            roundLabel.textContent = "Final";
-        } else if (r === numRounds - 2) {
-            roundLabel.textContent = "Semi-Final";
-        } else {
-            roundLabel.textContent = `Round ${r + 1} of ${numRounds}`;
-        }
+        roundLabel.textContent = r === numRounds - 1 ? "Final"
+            : r === numRounds - 2 ? "Semi-Final"
+            : `Round ${r + 1} of ${numRounds}`;
 
         matchLabel.textContent = totalInRound > 1
-            ? `Match ${doneInRound + 1} of ${totalInRound}`
-            : "";
+            ? `Match ${doneInRound + 1} of ${totalInRound}` : "";
 
         imgA.src = match.itemA.src;
         imgB.src = match.itemB.src;
@@ -325,14 +335,50 @@ document.addEventListener("DOMContentLoaded", () => {
         if (tournament.champion) championImg.src = tournament.champion.src;
     }
 
-    newTournamentBtn.addEventListener("click", () => {
+    // --- Reset ---
+    function resetToUpload() {
         tournament = null;
         uploadedItems = [];
         previewGrid.innerHTML = "";
-        uploadCountEl.classList.add("hidden");
-        startBtn.disabled = true;
+        updateUploadUI();
+        matchPhase.classList.add("hidden");
         championSection.classList.add("hidden");
         uploadPhase.classList.remove("hidden");
+        downloadBtn.disabled = true;
+        clearBtn.disabled    = true;
+    }
+
+    newBracketBtn.addEventListener("click", () => resetToUpload());
+
+    clearBtn.addEventListener("click", () => {
+        const msg = tournament && tournament.currentMatchId !== null
+            ? "Clear the bracket? All progress will be lost."
+            : "Clear the bracket?";
+        if (confirm(msg)) resetToUpload();
+    });
+
+    // --- Download bracket as image ---
+    downloadBtn.addEventListener("click", () => {
+        // Render into a hidden off-screen element so the modal doesn't need to be open.
+        const offscreen = document.createElement("div");
+        offscreen.style.cssText = "position:fixed;left:-99999px;top:0;padding:20px;background:var(--bg-color);";
+        document.body.appendChild(offscreen);
+        renderBracket(tournament, offscreen, tournament.currentMatchId);
+
+        const el = offscreen.firstElementChild;
+        if (!el) { offscreen.remove(); return; }
+        const isDark = document.body.classList.contains("dark-mode");
+        html2canvas(offscreen, {
+            scale: 2,
+            backgroundColor: isDark ? "#121212" : "#f4f5f7",
+            useCORS: true,
+        }).then(canvas => {
+            offscreen.remove();
+            const link = document.createElement("a");
+            link.download = "bracket.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        });
     });
 
     // --- Bracket modal ---
@@ -342,10 +388,10 @@ document.addEventListener("DOMContentLoaded", () => {
         bracketModal.classList.remove("hidden");
     }
 
-    viewBracketBtn.addEventListener("click",    () => openBracket(true));
-    viewFinalBtn.addEventListener("click",      () => openBracket(false));
-    closeBracketBtn.addEventListener("click",   () => bracketModal.classList.add("hidden"));
-    resumeBtn.addEventListener("click",         () => bracketModal.classList.add("hidden"));
+    viewBracketBtn.addEventListener("click",  () => openBracket(true));
+    viewFinalBtn.addEventListener("click",    () => openBracket(false));
+    closeBracketBtn.addEventListener("click", () => bracketModal.classList.add("hidden"));
+    resumeBtn.addEventListener("click",       () => bracketModal.classList.add("hidden"));
     bracketModal.addEventListener("click", (e) => { if (e.target === bracketModal) bracketModal.classList.add("hidden"); });
 
     updateUploadUI();
