@@ -13,11 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const MIN_TIERS = 4;
     const MAX_TIERS = 10;
 
-    const TIER_COLORS = [
-        "#FF7F7F", "#FFBF7F", "#FFDF7F", "#BFFF7F", "#7FFF7F",
-        "#7FBFFF", "#7F7FFF", "#BF7FFF", "#FF7FBF", "#BFBFBF",
-    ];
-
     const TOP_LABELS    = ["S", "SS", "X", "EX", "Z"];
     const BOTTOM_LABELS = ["F", "G", "H", "I", "J"];
 
@@ -52,17 +47,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function renderTiers() {
         tierContainer.innerHTML = "";
-        tiers.forEach((tier, index) => tierContainer.appendChild(buildTierRow(tier, index)));
+        tiers.forEach(tier => tierContainer.appendChild(buildTierRow(tier)));
     }
 
-    function buildTierRow(tier, index) {
+    function buildTierRow(tier) {
         const row = document.createElement("div");
         row.classList.add("tier-row");
 
         // ── Label ──
         const labelBox = document.createElement("div");
         labelBox.classList.add("tier-label");
-        labelBox.style.backgroundColor = TIER_COLORS[index % TIER_COLORS.length];
 
         const labelText = document.createElement("span");
         labelText.classList.add("tier-label-text");

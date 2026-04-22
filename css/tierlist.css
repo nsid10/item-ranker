@@ -48,6 +48,18 @@
     overflow: hidden;
 }
 
+/* --- TIER LABEL COLORS (positional) --- */
+.tier-row:nth-child(1)  .tier-label { background-color: #FF7F7F; }
+.tier-row:nth-child(2)  .tier-label { background-color: #FFBF7F; }
+.tier-row:nth-child(3)  .tier-label { background-color: #FFDF7F; }
+.tier-row:nth-child(4)  .tier-label { background-color: #BFFF7F; }
+.tier-row:nth-child(5)  .tier-label { background-color: #7FFF7F; }
+.tier-row:nth-child(6)  .tier-label { background-color: #7FBFFF; }
+.tier-row:nth-child(7)  .tier-label { background-color: #7F7FFF; }
+.tier-row:nth-child(8)  .tier-label { background-color: #BF7FFF; }
+.tier-row:nth-child(9)  .tier-label { background-color: #FF7FBF; }
+.tier-row:nth-child(10) .tier-label { background-color: #BFBFBF; }
+
 /* --- TIER LABEL --- */
 .tier-label {
     width: 88px;

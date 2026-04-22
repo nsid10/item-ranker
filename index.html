@@ -10,6 +10,7 @@
         <title>Rank Grid</title>
 
         <link rel="stylesheet" href="./css/style.css" />
+        <link rel="stylesheet" href="./css/grid.css" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     </head>
     <body>
@@ -53,6 +54,17 @@
                 <i class="uil uil-plus"></i>
             </button>
         </div>
+
+        <div id="unranked-section">
+            <p class="unranked-title">Unranked</p>
+            <div id="unranked-pool"></div>
+            <div id="grid-upload-area">
+                <i class="uil uil-cloud-upload"></i>
+                <p>Drop images here or <label for="grid-file-input">browse</label></p>
+                <input type="file" id="grid-file-input" accept="image/*" multiple hidden />
+            </div>
+        </div>
+
         <script src="./js/state.js"></script>
         <script src="./js/theme.js"></script>
         <script src="./js/ranker.js"></script>

@@ -1,98 +1,262 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    // --- DOM Elements ---
+    // --- DOM ---
     const gridContainer = document.getElementById("grid-container");
+    const unrankedPool  = document.getElementById("unranked-pool");
+    const uploadArea    = document.getElementById("grid-upload-area");
+    const fileInput     = document.getElementById("grid-file-input");
     const downloadBtn   = document.getElementById("download-btn");
     const clearAllBtn   = document.getElementById("clear-all-btn");
     const addRowBtn     = document.getElementById("add-row-btn");
     const removeRowBtn  = document.getElementById("remove-row-btn");
     const rankBtn       = document.getElementById("rank-btn");
 
-    // --- State & Constants ---
-    const COLS = 10;
+    // --- Constants ---
+    const COLS     = 10;
     const MIN_ROWS = 1;
     const MAX_ROWS = 10;
-    let numRows = 1;
-    let totalCells = numRows * COLS;
-    let gridState = Array(totalCells).fill(null);
-    let draggedImageSrc = null;
 
-    // --- Clear All Functionality ---
-    clearAllBtn.addEventListener("click", () => {
-        if (confirm("Are you sure you want to clear the entire grid?")) {
-            gridState = Array(totalCells).fill(null);
-            renderGrid();
-        }
-    });
+    // --- State ---
+    let numRows    = 1;
+    let totalCells = COLS;
+    let gridState  = Array(totalCells).fill(null); // {id, src} | null
+    let unranked   = []; // {id, src}[]
+    let itemIdCounter = 1;
+    let dragging   = null; // { item: {id, src}, fromCell: number | null }
 
-    // --- Download Functionality ---
-    downloadBtn.addEventListener("click", () => {
-        const isDarkMode = document.body.classList.contains("dark-mode");
-        const cells = Array.from(gridContainer.children);
+    function makeItem(src) { return { id: itemIdCounter++, src }; }
 
-        cells.forEach((cell, index) => {
-            if (!gridState[index]) {
-                cell.classList.add("hidden-for-export");
-            }
-        });
-
-        html2canvas(gridContainer, {
-            scale: 2,
-            backgroundColor: isDarkMode ? "#121212" : "#f4f5f7",
-            useCORS: true
-        }).then(canvas => {
-            cells.forEach(cell => cell.classList.remove("hidden-for-export"));
-
-            const link = document.createElement("a");
-            link.download = "grid-preview.png";
-            link.href = canvas.toDataURL("image/png");
-            link.click();
-        });
-    });
-
-    // --- Row Management ---
-    function updateRowButtons() {
-        addRowBtn.disabled = numRows >= MAX_ROWS;
-        removeRowBtn.disabled = numRows <= MIN_ROWS;
+    // --- Upload ---
+    function addImages(files) {
+        Array.from(files)
+            .filter(f => f.type.startsWith("image/"))
+            .forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    unranked.push(makeItem(e.target.result));
+                    renderUnranked();
+                };
+                reader.readAsDataURL(file);
+            });
     }
 
+    uploadArea.addEventListener("click", (e) => { if (e.target !== fileInput) fileInput.click(); });
+    fileInput.addEventListener("change", () => { addImages(fileInput.files); fileInput.value = ""; });
+    uploadArea.addEventListener("dragover",  (e) => { e.preventDefault(); uploadArea.classList.add("drag-over"); });
+    uploadArea.addEventListener("dragleave", (e) => { if (!uploadArea.contains(e.relatedTarget)) uploadArea.classList.remove("drag-over"); });
+    uploadArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadArea.classList.remove("drag-over");
+        if (e.dataTransfer.files.length > 0) addImages(e.dataTransfer.files);
+    });
+
+    // --- Build a grid item element ---
+    function buildGridItem(item, cellIndex) {
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("grid-item");
+        wrapper.draggable = true;
+
+        const img = document.createElement("img");
+        img.src = item.src;
+
+        const removeBtn = document.createElement("button");
+        removeBtn.classList.add("remove-btn");
+        removeBtn.innerHTML = '<i class="uil uil-times"></i>';
+        removeBtn.title = "Remove Image";
+        removeBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            gridState[cellIndex] = null;
+            unranked.push(item);
+            renderGrid();
+            renderUnranked();
+        });
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(removeBtn);
+
+        wrapper.addEventListener("dragstart", () => {
+            dragging = { item, fromCell: cellIndex };
+            setTimeout(() => wrapper.classList.add("dragging"), 0);
+        });
+        wrapper.addEventListener("dragend", () => {
+            wrapper.classList.remove("dragging");
+            dragging = null;
+        });
+
+        return wrapper;
+    }
+
+    // --- Build an unranked item element ---
+    function buildUnrankedItem(item) {
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("unranked-item");
+        wrapper.draggable = true;
+
+        const img = document.createElement("img");
+        img.src = item.src;
+
+        const removeBtn = document.createElement("button");
+        removeBtn.classList.add("item-remove-btn");
+        removeBtn.innerHTML = '<i class="uil uil-times"></i>';
+        removeBtn.title = "Remove";
+        removeBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            unranked = unranked.filter(u => u.id !== item.id);
+            renderUnranked();
+        });
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(removeBtn);
+
+        wrapper.addEventListener("dragstart", () => {
+            dragging = { item, fromCell: null };
+            setTimeout(() => wrapper.classList.add("dragging"), 0);
+        });
+        wrapper.addEventListener("dragend", () => {
+            wrapper.classList.remove("dragging");
+            dragging = null;
+        });
+
+        return wrapper;
+    }
+
+    // --- Place a dragged item into a grid cell ---
+    function placeItemInCell(item, fromCell, targetIndex) {
+        if (fromCell === targetIndex) return;
+
+        const targetItem = gridState[targetIndex];
+
+        if (fromCell !== null) {
+            gridState[fromCell] = null;
+        } else {
+            unranked = unranked.filter(u => u.id !== item.id);
+        }
+
+        let compact = gridState.filter(Boolean);
+
+        if (targetItem !== null) {
+            const idx = compact.findIndex(i => i.id === targetItem.id);
+            compact.splice(idx !== -1 ? idx : compact.length, 0, item);
+        } else {
+            compact.push(item);
+        }
+
+        expandRowsIfNeeded(compact.length);
+
+        gridState = Array(totalCells).fill(null);
+        compact.slice(0, totalCells).forEach((it, i) => { gridState[i] = it; });
+
+        renderGrid();
+        renderUnranked();
+        updateRowButtons();
+    }
+
+    // --- Expand grid rows to fit count items ---
+    function expandRowsIfNeeded(count) {
+        while (count > totalCells && numRows < MAX_ROWS) {
+            numRows++;
+            totalCells = numRows * COLS;
+            gridState.push(...Array(COLS).fill(null));
+            for (let i = totalCells - COLS; i < totalCells; i++) {
+                gridContainer.appendChild(createCell(i));
+            }
+        }
+    }
+
+    // --- Drop a file directly into a grid cell ---
+    function dropFileInCell(file, targetIndex) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const item = makeItem(e.target.result);
+            const targetItem = gridState[targetIndex];
+            let compact = gridState.filter(Boolean);
+            if (targetItem) {
+                const idx = compact.findIndex(i => i.id === targetItem.id);
+                compact.splice(idx !== -1 ? idx : compact.length, 0, item);
+            } else {
+                compact.push(item);
+            }
+            expandRowsIfNeeded(compact.length);
+            gridState = Array(totalCells).fill(null);
+            compact.slice(0, totalCells).forEach((it, i) => { gridState[i] = it; });
+            renderGrid();
+            updateRowButtons();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // --- Create a persistent grid cell element ---
     function createCell(index) {
         const cell = document.createElement("div");
         cell.classList.add("grid-cell");
 
-        const cellNumber = document.createElement("span");
-        cellNumber.classList.add("cell-number");
-        cellNumber.textContent = index + 1;
-        cell.appendChild(cellNumber);
+        const numberSpan = document.createElement("span");
+        numberSpan.classList.add("cell-number");
+        numberSpan.textContent = index + 1;
+        cell.appendChild(numberSpan);
 
-        cell.addEventListener("dragover", (e) => e.preventDefault());
+        cell.addEventListener("dragover", (e) => { e.preventDefault(); e.stopPropagation(); });
         cell.addEventListener("dragenter", (e) => {
             e.preventDefault();
-            cell.classList.add("drag-over");
+            if (dragging || e.dataTransfer.types.includes("Files")) cell.classList.add("drag-over");
         });
         cell.addEventListener("dragleave", (e) => {
-            if (!cell.contains(e.relatedTarget)) {
-                cell.classList.remove("drag-over");
-            }
+            if (!cell.contains(e.relatedTarget)) cell.classList.remove("drag-over");
         });
         cell.addEventListener("drop", (e) => {
             e.preventDefault();
             e.stopPropagation();
             cell.classList.remove("drag-over");
             const targetIndex = Array.from(gridContainer.children).indexOf(cell);
-
             if (e.dataTransfer.files.length > 0) {
                 const file = e.dataTransfer.files[0];
-                if (file.type.startsWith("image/")) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => handleDrop(targetIndex, event.target.result);
-                    reader.readAsDataURL(file);
-                }
-            } else if (draggedImageSrc) {
-                handleDrop(targetIndex, draggedImageSrc);
+                if (file.type.startsWith("image/")) dropFileInCell(file, targetIndex);
+            } else if (dragging) {
+                placeItemInCell(dragging.item, dragging.fromCell, targetIndex);
             }
         });
 
         return cell;
+    }
+
+    // --- Render grid ---
+    function renderGrid() {
+        const cells = Array.from(gridContainer.children);
+        gridState.forEach((item, index) => {
+            const cell = cells[index];
+            cell.innerHTML = "";
+            const numberSpan = document.createElement("span");
+            numberSpan.classList.add("cell-number");
+            numberSpan.textContent = index + 1;
+            cell.appendChild(numberSpan);
+            if (item) cell.appendChild(buildGridItem(item, index));
+        });
+    }
+
+    // --- Render unranked pool ---
+    function renderUnranked() {
+        unrankedPool.innerHTML = "";
+        unranked.forEach(item => unrankedPool.appendChild(buildUnrankedItem(item)));
+    }
+
+    // --- Unranked pool as drop target (grid items dragged here) ---
+    unrankedPool.addEventListener("dragover",  (e) => { e.preventDefault(); unrankedPool.classList.add("drag-over"); });
+    unrankedPool.addEventListener("dragleave", (e) => { if (!unrankedPool.contains(e.relatedTarget)) unrankedPool.classList.remove("drag-over"); });
+    unrankedPool.addEventListener("drop", (e) => {
+        e.preventDefault();
+        unrankedPool.classList.remove("drag-over");
+        if (dragging && dragging.fromCell !== null) {
+            gridState[dragging.fromCell] = null;
+            unranked.push(dragging.item);
+            renderGrid();
+            renderUnranked();
+        }
+    });
+
+    // --- Row management ---
+    function updateRowButtons() {
+        addRowBtn.disabled    = numRows >= MAX_ROWS;
+        removeRowBtn.disabled = numRows <= MIN_ROWS;
     }
 
     addRowBtn.addEventListener("click", () => {
@@ -101,110 +265,55 @@ document.addEventListener("DOMContentLoaded", async () => {
         numRows++;
         totalCells = numRows * COLS;
         gridState.push(...Array(COLS).fill(null));
-
-        for (let i = startIndex; i < totalCells; i++) {
-            gridContainer.appendChild(createCell(i));
-        }
-
+        for (let i = startIndex; i < totalCells; i++) gridContainer.appendChild(createCell(i));
         updateRowButtons();
     });
 
     removeRowBtn.addEventListener("click", () => {
         if (numRows <= MIN_ROWS) return;
+        const lastRowStart = totalCells - COLS;
+        for (let i = lastRowStart; i < totalCells; i++) {
+            if (gridState[i]) unranked.push(gridState[i]);
+        }
         numRows--;
         totalCells = numRows * COLS;
-
-        for (let i = 0; i < COLS; i++) {
-            gridContainer.removeChild(gridContainer.lastElementChild);
-        }
-
         gridState = gridState.slice(0, totalCells);
+        for (let i = 0; i < COLS; i++) gridContainer.removeChild(gridContainer.lastElementChild);
         updateRowButtons();
+        renderUnranked();
     });
 
-    // --- Core Grid Logic ---
-
-    function renderGrid() {
-        const cells = gridContainer.children;
-        gridState.forEach((imgSrc, index) => {
-            const cell = cells[index];
-            const numberSpan = cell.querySelector(".cell-number");
-
-            cell.innerHTML = "";
-            if (numberSpan) cell.appendChild(numberSpan);
-
-            if (imgSrc) {
-                const img = document.createElement("img");
-                img.src = imgSrc;
-                img.draggable = true;
-
-                img.addEventListener("dragstart", () => {
-                    draggedImageSrc = img.src;
-                    setTimeout(() => img.classList.add("dragging"), 0);
-                });
-
-                img.addEventListener("dragend", () => {
-                    img.classList.remove("dragging");
-                    draggedImageSrc = null;
-                });
-
-                const removeBtn = document.createElement("button");
-                removeBtn.classList.add("remove-btn");
-                removeBtn.innerHTML = `<i class="uil uil-times"></i>`;
-                removeBtn.title = "Remove Image";
-
-                removeBtn.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    removeImage(index);
-                });
-
-                cell.appendChild(img);
-                cell.appendChild(removeBtn);
-            }
-        });
-    }
-
-    function removeImage(index) {
-        const newState = gridState.filter((_, i) => i !== index);
-        newState.push(null);
-        gridState = newState;
-        renderGrid();
-    }
-
-    function handleDrop(targetIndex, imageSrc) {
-        let tempState = gridState.filter((src) => src && src !== imageSrc);
-        const targetIsPopulated = gridState[targetIndex] !== null;
-
-        if (targetIsPopulated) {
-            const itemAtTarget = gridState[targetIndex];
-            const insertAtIndex = tempState.indexOf(itemAtTarget);
-            if (insertAtIndex !== -1) {
-                tempState.splice(insertAtIndex, 0, imageSrc);
-            } else {
-                tempState.push(imageSrc);
-            }
-        } else {
-            tempState.push(imageSrc);
+    // --- Clear grid (moves items to unranked) ---
+    clearAllBtn.addEventListener("click", () => {
+        if (confirm("Move all grid items to unranked?")) {
+            gridState.forEach(item => { if (item) unranked.push(item); });
+            gridState = Array(totalCells).fill(null);
+            renderGrid();
+            renderUnranked();
         }
+    });
 
-        if (tempState.length > totalCells) {
-            tempState = tempState.slice(0, totalCells);
-        }
-
-        const newState = Array(totalCells).fill(null);
-        tempState.forEach((src, index) => {
-            newState[index] = src;
+    // --- Download ---
+    downloadBtn.addEventListener("click", () => {
+        const isDarkMode = document.body.classList.contains("dark-mode");
+        const cells = Array.from(gridContainer.children);
+        cells.forEach((cell, index) => { if (!gridState[index]) cell.classList.add("hidden-for-export"); });
+        html2canvas(gridContainer, {
+            scale: 2,
+            backgroundColor: isDarkMode ? "#121212" : "#f4f5f7",
+            useCORS: true,
+        }).then(canvas => {
+            cells.forEach(cell => cell.classList.remove("hidden-for-export"));
+            const link = document.createElement("a");
+            link.download = "grid-preview.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
         });
-
-        gridState = newState;
-        renderGrid();
-    }
+    });
 
     // --- Ranking ---
     rankBtn.addEventListener("click", () => {
-        const seeded = gridState
-            .filter(src => src !== null)
-            .map(src => ({ src }));
+        const seeded = gridState.filter(Boolean);
         if (seeded.length < 2) {
             alert("Add at least 2 images to the grid to start ranking.");
             return;
@@ -215,49 +324,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
-    // --- Grid Container Fallback Drop (gaps/padding between cells) ---
+    // --- Fallback container drop (gaps between cells) ---
     gridContainer.addEventListener("dragover", (e) => e.preventDefault());
     gridContainer.addEventListener("drop", (e) => {
         e.preventDefault();
-        const emptyIndex = gridState.indexOf(null);
-        if (emptyIndex === -1) return;
-
         if (e.dataTransfer.files.length > 0) {
-            const file = e.dataTransfer.files[0];
-            if (file.type.startsWith("image/")) {
-                const reader = new FileReader();
-                reader.onload = (event) => handleDrop(emptyIndex, event.target.result);
-                reader.readAsDataURL(file);
-            }
-        } else if (draggedImageSrc) {
-            handleDrop(emptyIndex, draggedImageSrc);
+            addImages(e.dataTransfer.files);
+            return;
+        }
+        if (dragging && dragging.fromCell === null) {
+            const emptyIndex = gridState.indexOf(null);
+            if (emptyIndex !== -1) placeItemInCell(dragging.item, null, emptyIndex);
         }
     });
 
-    // --- Initialization ---
-    for (let i = 0; i < totalCells; i++) {
-        gridContainer.appendChild(createCell(i));
-    }
+    // --- Init ---
+    for (let i = 0; i < totalCells; i++) gridContainer.appendChild(createCell(i));
 
-    // --- Load Ranking Result (stored in IndexedDB by ranking page) ---
+    // --- Load ranking result ---
     try {
         const ranked = await State.largeGet("rankingResult");
         if (Array.isArray(ranked) && ranked.length > 0) {
             await State.largeRemove("rankingResult");
-            const neededRows = Math.min(Math.ceil(ranked.length / COLS), MAX_ROWS);
-            while (numRows < neededRows) {
-                numRows++;
-                totalCells = numRows * COLS;
-                gridState.push(...Array(COLS).fill(null));
-                for (let i = totalCells - COLS; i < totalCells; i++) {
-                    gridContainer.appendChild(createCell(i));
-                }
-            }
+            expandRowsIfNeeded(ranked.length);
             gridState = Array(totalCells).fill(null);
-            ranked.slice(0, totalCells).forEach((src, i) => { gridState[i] = src; });
+            ranked.slice(0, totalCells).forEach((src, i) => { gridState[i] = makeItem(src); });
             renderGrid();
         }
-    } catch (_) { /* IndexedDB unavailable or data corrupt — start with empty grid */ }
+    } catch (_) {}
 
     updateRowButtons();
 });
