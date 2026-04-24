@@ -43,7 +43,7 @@
 
 .tier-row {
     display: flex;
-    min-height: 130px;
+    height: 140px;
     border-radius: 4px;
     overflow: hidden;
 }
@@ -133,9 +133,9 @@
     flex-wrap: wrap;
     align-content: flex-start;
     gap: 4px;
-    padding: 4px;
+    padding: 0;
     background-color: var(--cell-bg-color);
-    min-height: 130px;
+    overflow: hidden;
     transition: background-color 0.15s;
 }
 
@@ -148,9 +148,9 @@
 /* --- ITEMS --- */
 .tier-item {
     position: relative;
-    width: 88px;
     flex-shrink: 0;
     cursor: grab;
+    padding: 2px;
 }
 
 .tier-item:active {
@@ -158,7 +158,8 @@
 }
 
 .tier-item img {
-    width: 100%;
+    height: 100%;
+    width: auto;
     aspect-ratio: 17 / 24;
     object-fit: cover;
     border-radius: 4px;
