@@ -1,3 +1,5 @@
+.hidden { display: none; }
+
 /* --- UPLOAD PHASE --- */
 #upload-phase {
     max-width: 900px;
@@ -128,31 +130,17 @@
     opacity: 0.85;
 }
 
-.tourn-outline-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    font-size: 15px;
-    background-color: transparent;
-    color: var(--button-text-color);
-    border: 1px solid var(--button-border-color);
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 16px;
-    transition: background-color 0.2s;
-}
-
-.tourn-outline-btn:hover {
-    background-color: var(--button-bg-hover-color);
-}
-
 /* --- MATCH PHASE --- */
 #match-phase {
     display: flex;
     flex-direction: column;
+}
+
+#vs-ui {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    padding: 40px 20px;
+    padding: 40px 20px 24px;
 }
 
 #round-label {
@@ -220,145 +208,35 @@
     user-select: none;
 }
 
-#view-bracket-btn {
-    margin-top: 28px;
+/* --- DONE BANNER --- */
+#done-banner {
     display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 20px;
-    background: transparent;
-    border: 1px solid var(--button-border-color);
-    border-radius: 6px;
-    color: var(--cell-number-color);
-    font-size: 13px;
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
-}
-
-#view-bracket-btn:hover {
-    background-color: var(--button-bg-hover-color);
-    border-color: var(--button-text-color);
-    color: var(--button-text-color);
-}
-
-/* --- CHAMPION --- */
-#champion-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 60px 20px;
-}
-
-#champion-title {
-    font-size: 28px;
-    font-weight: 900;
-    color: var(--drag-over-outline-color);
-    margin: 0 0 24px;
-    letter-spacing: 0.05em;
-}
-
-#champion-card {
-    width: 220px;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-}
-
-#champion-card img {
-    width: 100%;
-    aspect-ratio: 17 / 24;
-    object-fit: cover;
-    display: block;
-}
-
-#champion-actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-wrap: wrap;
     justify-content: center;
+    padding: 8px 20px 24px;
 }
 
-/* --- BRACKET MODAL --- */
-#bracket-modal {
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.75);
-    z-index: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+#done-banner .tourn-primary-btn {
+    margin-top: 0;
 }
 
-#bracket-modal.hidden {
-    display: none;
-}
-
-#bracket-modal-inner {
-    background-color: var(--bg-color);
-    border-radius: 16px;
-    width: min(92vw, 1100px);
-    max-height: 88vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-#bracket-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--button-border-color);
-    flex-shrink: 0;
-}
-
-#bracket-modal-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--header-color);
-}
-
-#close-bracket-btn {
-    width: 32px;
-    height: 32px;
-    border: none;
-    background: transparent;
-    border-radius: 6px;
-    color: var(--cell-number-color);
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.15s;
-}
-
-#close-bracket-btn:hover {
-    background-color: var(--button-bg-hover-color);
+/* --- INLINE BRACKET --- */
+#bracket-section {
+    margin: 0 20px 48px;
+    border-top: 1px solid var(--button-border-color);
+    padding-top: 20px;
 }
 
 #bracket-scroll {
     overflow: auto;
-    flex: 1;
-    padding: 24px;
+    max-height: 65vh;
+    border-radius: 8px;
+    background-color: var(--cell-bg-color);
+    padding: 20px;
 }
 
 #bracket-view {
     display: inline-block;
     min-width: 100%;
-}
-
-#bracket-modal-footer {
-    padding: 12px 20px;
-    border-top: 1px solid var(--button-border-color);
-    display: flex;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-#bracket-modal-footer .tourn-primary-btn {
-    margin-top: 0;
 }
 
 /* --- BRACKET ENTRIES --- */
@@ -399,6 +277,12 @@
 .b-entry--winner {
     border-color: var(--drag-over-outline-color);
     outline: 2px solid var(--drag-over-outline-color);
+}
+
+.b-entry--champion {
+    border-color: #f59e0b;
+    outline: 3px solid #f59e0b;
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.5);
 }
 
 .b-entry--bye {

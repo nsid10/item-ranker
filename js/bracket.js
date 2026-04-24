@@ -128,8 +128,8 @@ function renderBracket(tournament, container, currentMatchId) {
 
     const colorActive  = cssVar("--drag-over-outline-color");
     const colorBorder  = cssVar("--button-border-color");
-    const colorPending = cssVar("--cell-bg-color");
 
+    const champion  = tournament.champion;
     const numRounds = tournament.rounds.length;
     const totalW = numRounds * (MATCH_W + ROUND_GAP) - ROUND_GAP;
     const totalH = tournament.size * SLOT_H;
@@ -143,6 +143,7 @@ function renderBracket(tournament, container, currentMatchId) {
     svg.style.cssText = "position:absolute;inset:0;pointer-events:none;overflow:visible;";
 
     tournament.rounds.forEach((round, ri) => {
+        const isFinalRound = ri === numRounds - 1;
         round.forEach(match => {
             const cy   = matchCenterY(match, tournament);
             const top  = cy - MATCH_H / 2;
@@ -153,8 +154,10 @@ function renderBracket(tournament, container, currentMatchId) {
             if (match.id === currentMatchId) card.classList.add("b-match--current");
             card.style.cssText = `position:absolute;top:${top}px;left:${left}px;width:${MATCH_W}px;`;
 
-            card.appendChild(makeEntry(match.itemA, match.winner === match.itemA && match.winner != null));
-            card.appendChild(makeEntry(match.itemB, match.winner === match.itemB && match.winner != null));
+            const isChampA = isFinalRound && champion && match.itemA === champion;
+            const isChampB = isFinalRound && champion && match.itemB === champion;
+            card.appendChild(makeEntry(match.itemA, match.winner === match.itemA && match.winner != null, isChampA));
+            card.appendChild(makeEntry(match.itemB, match.winner === match.itemB && match.winner != null, isChampB));
             wrap.appendChild(card);
 
             // Connector line from this match to its parent match
@@ -182,10 +185,11 @@ function renderBracket(tournament, container, currentMatchId) {
     container.appendChild(wrap);
 }
 
-function makeEntry(item, isWinner) {
+function makeEntry(item, isWinner, isChampion) {
     const el = document.createElement("div");
     el.classList.add("b-entry");
-    if (isWinner) el.classList.add("b-entry--winner");
+    if (isChampion) el.classList.add("b-entry--champion");
+    else if (isWinner) el.classList.add("b-entry--winner");
     if (!item) { el.classList.add("b-entry--bye"); el.textContent = "bye"; return el; }
     const img = document.createElement("img");
     img.src = item.src;
@@ -197,45 +201,39 @@ function makeEntry(item, isWinner) {
 // --- Page logic ---
 
 document.addEventListener("DOMContentLoaded", () => {
-    const MAX_IMAGES = 64;
+    const MAX_IMAGES = 512;
+    const MIN_IMAGES = 8;
     let uploadedItems = [];
     let tournament    = null;
 
-    const uploadPhase     = document.getElementById("upload-phase");
-    const matchPhase      = document.getElementById("match-phase");
-    const championSection = document.getElementById("champion-section");
-    const uploadArea      = document.getElementById("upload-area");
-    const fileInput       = document.getElementById("file-input");
-    const previewGrid     = document.getElementById("preview-grid");
-    const uploadCountEl   = document.getElementById("upload-count");
-    const startBtn        = document.getElementById("start-btn");
-    const downloadBtn     = document.getElementById("download-btn");
-    const clearBtn        = document.getElementById("clear-btn");
+    const uploadPhase  = document.getElementById("upload-phase");
+    const matchPhase   = document.getElementById("match-phase");
+    const vsUi         = document.getElementById("vs-ui");
+    const doneBanner   = document.getElementById("done-banner");
+    const uploadArea   = document.getElementById("upload-area");
+    const fileInput    = document.getElementById("file-input");
+    const previewGrid  = document.getElementById("preview-grid");
+    const uploadCountEl = document.getElementById("upload-count");
+    const startBtn     = document.getElementById("start-btn");
+    const downloadBtn  = document.getElementById("download-btn");
+    const clearBtn     = document.getElementById("clear-btn");
 
-    const roundLabel      = document.getElementById("round-label");
-    const matchLabel      = document.getElementById("match-label");
-    const imgA            = document.getElementById("img-a");
-    const imgB            = document.getElementById("img-b");
-    const sideA           = document.getElementById("side-a");
-    const sideB           = document.getElementById("side-b");
-    const viewBracketBtn  = document.getElementById("view-bracket-btn");
+    const roundLabel   = document.getElementById("round-label");
+    const matchLabel   = document.getElementById("match-label");
+    const imgA         = document.getElementById("img-a");
+    const imgB         = document.getElementById("img-b");
+    const sideA        = document.getElementById("side-a");
+    const sideB        = document.getElementById("side-b");
 
-    const championImg     = document.getElementById("champion-img");
-    const viewFinalBtn    = document.getElementById("view-final-bracket-btn");
-    const newBracketBtn   = document.getElementById("new-bracket-btn");
-
-    const bracketModal    = document.getElementById("bracket-modal");
-    const closeBracketBtn = document.getElementById("close-bracket-btn");
-    const bracketView     = document.getElementById("bracket-view");
-    const bracketFooter   = document.getElementById("bracket-modal-footer");
-    const resumeBtn       = document.getElementById("resume-btn");
+    const newBracketBtn = document.getElementById("new-bracket-btn");
+    const bracketView   = document.getElementById("bracket-view");
 
     // --- Upload ---
     function updateUploadUI() {
         const n = uploadedItems.length;
         uploadCountEl.textContent = `${n} / ${MAX_IMAGES} images`;
         uploadCountEl.classList.toggle("hidden", n === 0);
-        startBtn.disabled = n < 2;
+        startBtn.disabled = n < MIN_IMAGES;
     }
 
     function addImages(files) {
@@ -287,13 +285,14 @@ document.addEventListener("DOMContentLoaded", () => {
         matchPhase.classList.remove("hidden");
         downloadBtn.disabled = false;
         clearBtn.disabled    = false;
+        updateBracket();
         showCurrentMatch();
     });
 
     // --- Match UI ---
     function showCurrentMatch() {
         const match = tournament.currentMatch;
-        if (!match) { showChampion(); return; }
+        if (!match) { showDone(); return; }
 
         const r            = match.round;
         const numRounds    = tournament.rounds.length;
@@ -321,6 +320,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
             el.classList.remove("winner-flash");
             tournament.pickWinner(match.id, winner);
+            updateBracket();
             showCurrentMatch();
         }, 150);
     }
@@ -328,11 +328,16 @@ document.addEventListener("DOMContentLoaded", () => {
     sideA.addEventListener("click", () => pickAndAdvance("A"));
     sideB.addEventListener("click", () => pickAndAdvance("B"));
 
-    // --- Champion ---
-    function showChampion() {
-        matchPhase.classList.add("hidden");
-        championSection.classList.remove("hidden");
-        if (tournament.champion) championImg.src = tournament.champion.src;
+    // --- Bracket ---
+    function updateBracket() {
+        renderBracket(tournament, bracketView, tournament.currentMatchId);
+    }
+
+    // --- Done state ---
+    function showDone() {
+        vsUi.classList.add("hidden");
+        doneBanner.classList.remove("hidden");
+        updateBracket();
     }
 
     // --- Reset ---
@@ -340,9 +345,11 @@ document.addEventListener("DOMContentLoaded", () => {
         tournament = null;
         uploadedItems = [];
         previewGrid.innerHTML = "";
+        bracketView.innerHTML = "";
         updateUploadUI();
+        vsUi.classList.remove("hidden");
+        doneBanner.classList.add("hidden");
         matchPhase.classList.add("hidden");
-        championSection.classList.add("hidden");
         uploadPhase.classList.remove("hidden");
         downloadBtn.disabled = true;
         clearBtn.disabled    = true;
@@ -359,12 +366,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Download bracket as image ---
     downloadBtn.addEventListener("click", () => {
-        // Render into a hidden off-screen element so the modal doesn't need to be open.
         const offscreen = document.createElement("div");
         offscreen.style.cssText = "position:fixed;left:-99999px;top:0;padding:20px;background:var(--bg-color);";
         document.body.appendChild(offscreen);
         renderBracket(tournament, offscreen, tournament.currentMatchId);
-
         const el = offscreen.firstElementChild;
         if (!el) { offscreen.remove(); return; }
         const isDark = document.body.classList.contains("dark-mode");
@@ -380,19 +385,6 @@ document.addEventListener("DOMContentLoaded", () => {
             link.click();
         });
     });
-
-    // --- Bracket modal ---
-    function openBracket(showResume) {
-        renderBracket(tournament, bracketView, tournament.currentMatchId);
-        bracketFooter.classList.toggle("hidden", !showResume);
-        bracketModal.classList.remove("hidden");
-    }
-
-    viewBracketBtn.addEventListener("click",  () => openBracket(true));
-    viewFinalBtn.addEventListener("click",    () => openBracket(false));
-    closeBracketBtn.addEventListener("click", () => bracketModal.classList.add("hidden"));
-    resumeBtn.addEventListener("click",       () => bracketModal.classList.add("hidden"));
-    bracketModal.addEventListener("click", (e) => { if (e.target === bracketModal) bracketModal.classList.add("hidden"); });
 
     updateUploadUI();
 });

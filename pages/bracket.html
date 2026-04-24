@@ -20,7 +20,7 @@
                 <span>Tier List</span>
             </button>
             <button class="nav-btn active" onclick="window.location.href='./bracket.html'" title="Bracket">
-                <i class="uil uil-trophy"></i>
+                <i class="uil uil-shield"></i>
                 <span>Bracket</span>
             </button>
         </nav>
@@ -43,7 +43,7 @@
             <div id="upload-area">
                 <i class="uil uil-cloud-upload"></i>
                 <p>Drop images here or <label for="file-input">browse</label></p>
-                <p class="upload-hint">2 – 64 images</p>
+                <p class="upload-hint">8 – 512 images</p>
                 <input type="file" id="file-input" accept="image/*" multiple hidden />
             </div>
             <p id="upload-count" class="hidden"></p>
@@ -53,55 +53,30 @@
             </button>
         </div>
 
-        <!-- Phase 2: Head-to-head -->
+        <!-- Phase 2: Match + inline bracket -->
         <div id="match-phase" class="hidden">
-            <p id="round-label"></p>
-            <p id="match-label"></p>
-            <p class="pick-hint">Click the winner</p>
-            <div id="match-container">
-                <div class="match-side" id="side-a">
-                    <img id="img-a" alt="Option A" />
-                </div>
-                <div id="vs-label">VS</div>
-                <div class="match-side" id="side-b">
-                    <img id="img-b" alt="Option B" />
+            <div id="vs-ui">
+                <p id="round-label"></p>
+                <p id="match-label"></p>
+                <p class="pick-hint">Click the winner</p>
+                <div id="match-container">
+                    <div class="match-side" id="side-a">
+                        <img id="img-a" alt="Option A" />
+                    </div>
+                    <div id="vs-label">VS</div>
+                    <div class="match-side" id="side-b">
+                        <img id="img-b" alt="Option B" />
+                    </div>
                 </div>
             </div>
-            <button id="view-bracket-btn">
-                <i class="uil uil-sitemap"></i> View Bracket
-            </button>
-        </div>
-
-        <!-- Phase 3: Champion -->
-        <div id="champion-section" class="hidden">
-            <h2 id="champion-title">Champion!</h2>
-            <div id="champion-card">
-                <img id="champion-img" alt="Champion" />
-            </div>
-            <div id="champion-actions">
-                <button id="view-final-bracket-btn" class="tourn-outline-btn">
-                    <i class="uil uil-sitemap"></i> View Bracket
-                </button>
+            <div id="done-banner" class="hidden">
                 <button id="new-bracket-btn" class="tourn-primary-btn">
                     <i class="uil uil-redo"></i> New Bracket
                 </button>
             </div>
-        </div>
-
-        <!-- Bracket Modal -->
-        <div id="bracket-modal" class="hidden">
-            <div id="bracket-modal-inner">
-                <div id="bracket-modal-header">
-                    <span id="bracket-modal-title">Bracket</span>
-                    <button id="close-bracket-btn"><i class="uil uil-times"></i></button>
-                </div>
+            <div id="bracket-section">
                 <div id="bracket-scroll">
                     <div id="bracket-view"></div>
-                </div>
-                <div id="bracket-modal-footer" class="hidden">
-                    <button id="resume-btn" class="tourn-primary-btn">
-                        <i class="uil uil-play"></i> Resume Match
-                    </button>
                 </div>
             </div>
         </div>
