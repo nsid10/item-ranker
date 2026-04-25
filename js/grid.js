@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     let itemIdCounter = 1;
     let dragging   = null; // { item: {id, src}, fromCell: number | null }
 
-    function makeItem(src) { return { id: itemIdCounter++, src }; }
+    function makeItem(src, name = "") { return { id: itemIdCounter++, src, name }; }
 
     // --- Upload ---
     function addImages(files) {
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             .forEach(file => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    unranked.push(makeItem(e.target.result));
+                    unranked.push(makeItem(e.target.result, file.name));
                     renderUnranked();
                 };
                 reader.readAsDataURL(file);
@@ -167,7 +167,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     function dropFileInCell(file, targetIndex) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            const item = makeItem(e.target.result);
+            const item = makeItem(e.target.result, file.name);
             const targetItem = gridState[targetIndex];
             let compact = gridState.filter(Boolean);
             if (targetItem) {

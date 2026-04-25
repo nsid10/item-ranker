@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const MIN_TIERS = 4;
     const MAX_TIERS = 10;
 
-    const TOP_LABELS    = ["S", "SS", "X", "EX", "Z"];
+    const TOP_LABELS    = ["S", "SS"];
     const BOTTOM_LABELS = ["F", "G", "H", "I", "J"];
 
     // --- State ---

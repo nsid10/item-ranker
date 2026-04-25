@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             .map((itemIdx, rank) => ({ rank: rank + 1, item: ranker.items[itemIdx], elo: ranker.ratings[itemIdx] }));
 
         debugTbody.innerHTML = rows.map(({ rank, item, elo }) =>
-            `<tr><td>${rank}</td><td>Item ${item.id}</td><td>${Math.round(elo)}</td></tr>`
+            `<tr><td>${rank}</td><td>${item.name || `#${item.id}`}</td><td>${Math.round(elo)}</td></tr>`
         ).join("");
     }
 
