@@ -148,6 +148,7 @@
 /* --- ITEMS --- */
 .tier-item {
     position: relative;
+    height: 136px;
     flex-shrink: 0;
     cursor: grab;
     padding: 2px;
