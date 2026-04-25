@@ -318,10 +318,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Ranking ---
     document.getElementById("rank-btn").addEventListener("click", () => {
-        // Seed: tier items top-to-bottom, unranked inserted at the median position.
-        const tierItems = tiers.flatMap(t => t.items);
-        const mid = Math.ceil(tierItems.length / 2);
-        const seeded = [...tierItems.slice(0, mid), ...unranked, ...tierItems.slice(mid)];
+        // Assign starting Elo by tier position; unranked items get 950.
+        const TIER_ELO = [1200, 1100, 1000, 900, 800, 700, 600, 500, 400, 300];
+        const seeded = [
+            ...tiers.flatMap((t, ti) =>
+                t.items.map(item => ({ ...item, startElo: TIER_ELO[ti] ?? 300 }))
+            ),
+            ...unranked.map(item => ({ ...item, startElo: 950 })),
+        ];
         if (seeded.length < 2) {
             alert("Add at least 2 images to start ranking.");
             return;

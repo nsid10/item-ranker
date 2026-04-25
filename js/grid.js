@@ -313,7 +313,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // --- Ranking ---
     rankBtn.addEventListener("click", () => {
-        const seeded = gridState.filter(Boolean);
+        const items = gridState.filter(Boolean);
+        const n = items.length;
+        const seeded = items.map((item, i) => ({ ...item, startElo: 1000 + (n - 1 - i) * 20 }));
         if (seeded.length < 2) {
             alert("Add at least 2 images to the grid to start ranking.");
             return;
