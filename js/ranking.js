@@ -59,17 +59,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         confidenceLabel.textContent = `Confidence: ${lower}% – ${upper}%`;
     }
 
-    const debugTbody = document.getElementById("debug-elo-tbody");
-    function updateDebugTable() {
-        const rows = Array.from({ length: ranker.n }, (_, i) => i)
-            .sort((a, b) => ranker.ratings[b] - ranker.ratings[a])
-            .map((itemIdx, rank) => ({ rank: rank + 1, item: ranker.items[itemIdx], elo: ranker.ratings[itemIdx] }));
-
-        debugTbody.innerHTML = rows.map(({ rank, item, elo }) =>
-            `<tr><td>${rank}</td><td>${item.name || `#${item.id}`}</td><td>${Math.round(elo)}</td></tr>`
-        ).join("");
-    }
-
     function applyStep(step) {
         if (step.type === "done") { finish(step.result); return; }
         phaseEl.textContent  = step.phase;
@@ -78,7 +67,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         imgA.src = step.itemA.src;
         imgB.src = step.itemB.src;
         updateConfidence();
-        updateDebugTable();
     }
 
     function pickAndAdvance(side) {
