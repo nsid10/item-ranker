@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- State ---
     let itemIdCounter = 1;
     let tierIdCounter = 6;
-    function makeItem(src) { return { id: itemIdCounter++, src }; }
+    function makeItem(src, name = "") { return { id: itemIdCounter++, src, name }; }
 
     let tiers = [
         { id: 1, label: "A", items: [] },
@@ -262,7 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .filter(f => f.type.startsWith("image/"))
             .forEach(file => {
                 const reader = new FileReader();
-                reader.onload = (e) => callback(makeItem(e.target.result));
+                reader.onload = (e) => callback(makeItem(e.target.result, file.name));
                 reader.readAsDataURL(file);
             });
     }
@@ -318,13 +318,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Ranking ---
     document.getElementById("rank-btn").addEventListener("click", () => {
-        // Assign starting Elo by tier position; unranked items get 950.
-        const TIER_ELO = [1200, 1100, 1000, 900, 800, 700, 600, 500, 400, 300];
         const seeded = [
             ...tiers.flatMap((t, ti) =>
-                t.items.map(item => ({ ...item, startElo: TIER_ELO[ti] ?? 300 }))
+                t.items.map(item => ({ ...item, seedTier: ti }))
             ),
-            ...unranked.map(item => ({ ...item, startElo: 950 })),
+            ...unranked.map(item => ({ ...item, seedTier: tiers.length })),
         ];
         if (seeded.length < 2) {
             alert("Add at least 2 images to start ranking.");
