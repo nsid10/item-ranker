@@ -341,7 +341,7 @@ class TournamentRanker {
                     this.currentMatch = this.matchQueue[this.queuePos++];
                     const { a, b } = this.currentMatch;
                     return { type: "comparison", itemA: this.items[a], itemB: this.items[b],
-                             phase: "Top 6 Tiebreak" };
+                             phase: "Tiebreakers" };
                 }
                 return this._completePhase5();
             }
