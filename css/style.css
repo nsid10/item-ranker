@@ -74,8 +74,14 @@ h1 {
     justify-content: flex-start;
     background-color: var(--cell-bg-color);
     border-radius: 8px;
-    aspect-ratio: 17 / 24;
+    position: relative;
+    overflow: hidden;
     transition: background-color 0.2s;
+}
+
+.grid-cell:not(:has(.grid-item)) {
+    aspect-ratio: 17 / 24;
+    justify-content: center;
 }
 
 .grid-cell img {
@@ -92,9 +98,10 @@ h1 {
     order: 2;
     font-size: 14px;
     color: var(--cell-number-color);
-    margin-top: 4px;
-    margin-block: 4px;
     font-weight: 700;
+    padding: 5px 0 4px;
+    text-align: center;
+    width: 100%;
     transition: color 0.2s;
 }
 
