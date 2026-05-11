@@ -52,7 +52,7 @@
 
 .match-side img {
     width: 100%;
-    aspect-ratio: 17 / 24;
+    aspect-ratio: var(--img-aspect);
     object-fit: cover;
     display: block;
     pointer-events: none;

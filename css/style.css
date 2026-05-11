@@ -13,6 +13,8 @@
     --drag-over-outline-color: #4a75d1;
     --remove-btn-bg: rgba(0, 0, 0, 0.1);
     --remove-btn-color: #333;
+
+    --img-aspect: 17 / 24;
 }
 
 body.dark-mode {
@@ -56,53 +58,6 @@ h1 {
     margin-top: 80px;
     margin-bottom: 30px;
     text-align: center;
-}
-
-#grid-container {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 24px;
-    max-width: 2000px;
-    padding: 20px;
-    margin: 0 auto 40px auto;
-}
-
-.grid-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    background-color: var(--cell-bg-color);
-    border-radius: 8px;
-    position: relative;
-    overflow: hidden;
-    transition: background-color 0.2s;
-}
-
-.grid-cell:not(:has(.grid-item)) {
-    aspect-ratio: 17 / 24;
-    justify-content: center;
-}
-
-.grid-cell img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    aspect-ratio: 17 / 24;
-    order: 1;
-    border-radius: 8px;
-    pointer-events: none;
-}
-
-.cell-number {
-    order: 2;
-    font-size: 14px;
-    color: var(--cell-number-color);
-    font-weight: 700;
-    padding: 5px 0 4px;
-    text-align: center;
-    width: 100%;
-    transition: color 0.2s;
 }
 
 .drag-over {
@@ -194,77 +149,6 @@ h1 {
 .nav-btn.active {
     color: var(--drag-over-outline-color);
     background-color: var(--drag-over-bg-color);
-}
-
-/* --- DELETE BUTTON STYLES --- */
-.grid-cell {
-    position: relative; /* Necessary for absolute positioning of the delete icon */
-}
-
-.remove-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background-color: var(--remove-btn-bg);
-    color: var(--remove-btn-color);
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    font-size: 16px;
-    backdrop-filter: blur(4px); /* Adds a modern touch */
-    transition:
-        background-color 0.2s,
-        transform 0.1s;
-}
-
-.remove-btn:hover {
-    background-color: var(--button-bg-hover-color);
-    transform: scale(1.1);
-}
-
-.grid-cell:hover .remove-btn {
-    display: flex;
-}
-
-/* --- ROW CONTROLS --- */
-#row-controls {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 40px;
-}
-
-#row-controls button {
-    width: 42px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    background-color: transparent;
-    border: none;
-    border-radius: 6px;
-    color: var(--button-text-color);
-    cursor: pointer;
-    transition:
-        background-color 0.2s,
-        color 0.2s,
-        opacity 0.2s;
-}
-
-#row-controls button:hover:not(:disabled) {
-    background-color: var(--button-bg-hover-color);
-}
-
-#row-controls button:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
 }
 
 /* --- DOWNLOAD UTILITY --- */

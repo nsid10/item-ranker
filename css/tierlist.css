@@ -161,7 +161,7 @@
 .tier-item img {
     height: 100%;
     width: auto;
-    aspect-ratio: 17 / 24;
+    aspect-ratio: var(--img-aspect);
     object-fit: cover;
     border-radius: 4px;
     display: block;
