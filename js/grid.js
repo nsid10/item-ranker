@@ -163,29 +163,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // --- Drop a file directly into a grid cell ---
-    function dropFileInCell(file, targetIndex) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const item = makeItem(e.target.result, file.name);
-            const targetItem = gridState[targetIndex];
-            let compact = gridState.filter(Boolean);
-            if (targetItem) {
-                const idx = compact.findIndex(i => i.id === targetItem.id);
-                compact.splice(idx !== -1 ? idx : compact.length, 0, item);
-            } else {
-                compact.push(item);
-            }
-            expandRowsIfNeeded(compact.length);
-            gridState = Array(totalCells).fill(null);
-            compact.slice(0, totalCells).forEach((it, i) => { gridState[i] = it; });
-            renderGrid();
-            updateRowButtons();
-        };
-        reader.readAsDataURL(file);
-    }
-
     // --- Create a persistent grid cell element ---
+    // External file drops are intentionally NOT accepted here — the upload area
+    // below is the only entry point for new images.
     function createCell(index) {
         const cell = document.createElement("div");
         cell.classList.add("grid-cell");
@@ -195,25 +175,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         numberSpan.textContent = index + 1;
         cell.appendChild(numberSpan);
 
-        cell.addEventListener("dragover", (e) => { e.preventDefault(); e.stopPropagation(); });
-        cell.addEventListener("dragenter", (e) => {
+        cell.addEventListener("dragover", (e) => {
+            if (!dragging) return;
             e.preventDefault();
-            if (dragging || e.dataTransfer.types.includes("Files")) cell.classList.add("drag-over");
+            e.stopPropagation();
+        });
+        cell.addEventListener("dragenter", (e) => {
+            if (!dragging) return;
+            e.preventDefault();
+            cell.classList.add("drag-over");
         });
         cell.addEventListener("dragleave", (e) => {
             if (!cell.contains(e.relatedTarget)) cell.classList.remove("drag-over");
         });
         cell.addEventListener("drop", (e) => {
+            if (!dragging) return;
             e.preventDefault();
             e.stopPropagation();
             cell.classList.remove("drag-over");
             const targetIndex = Array.from(gridContainer.children).indexOf(cell);
-            if (e.dataTransfer.files.length > 0) {
-                const file = e.dataTransfer.files[0];
-                if (file.type.startsWith("image/")) dropFileInCell(file, targetIndex);
-            } else if (dragging) {
-                placeItemInCell(dragging.item, dragging.fromCell, targetIndex);
-            }
+            placeItemInCell(dragging.item, dragging.fromCell, targetIndex);
         });
 
         return cell;
@@ -239,13 +220,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         unranked.forEach(item => unrankedPool.appendChild(buildUnrankedItem(item)));
     }
 
-    // --- Unranked pool as drop target (grid items dragged here) ---
-    unrankedPool.addEventListener("dragover",  (e) => { e.preventDefault(); unrankedPool.classList.add("drag-over"); });
-    unrankedPool.addEventListener("dragleave", (e) => { if (!unrankedPool.contains(e.relatedTarget)) unrankedPool.classList.remove("drag-over"); });
+    // --- Unranked pool as drop target (grid items dragged here only — no files) ---
+    unrankedPool.addEventListener("dragover", (e) => {
+        if (!dragging) return;
+        e.preventDefault();
+        unrankedPool.classList.add("drag-over");
+    });
+    unrankedPool.addEventListener("dragleave", (e) => {
+        if (!unrankedPool.contains(e.relatedTarget)) unrankedPool.classList.remove("drag-over");
+    });
     unrankedPool.addEventListener("drop", (e) => {
+        if (!dragging) return;
         e.preventDefault();
         unrankedPool.classList.remove("drag-over");
-        if (dragging && dragging.fromCell !== null) {
+        if (dragging.fromCell !== null) {
             gridState[dragging.fromCell] = null;
             unranked.push(dragging.item);
             renderGrid();
@@ -327,18 +315,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // --- Fallback container drop (gaps between cells) ---
-    gridContainer.addEventListener("dragover", (e) => e.preventDefault());
-    gridContainer.addEventListener("drop", (e) => {
+    // Only internal drags from the unranked pool are accepted — files must go
+    // through the upload area below.
+    gridContainer.addEventListener("dragover", (e) => {
+        if (!dragging) return;
         e.preventDefault();
-        if (e.dataTransfer.files.length > 0) {
-            addImages(e.dataTransfer.files);
-            return;
-        }
-        if (dragging && dragging.fromCell === null) {
+    });
+    gridContainer.addEventListener("drop", (e) => {
+        if (!dragging) return;
+        e.preventDefault();
+        if (dragging.fromCell === null) {
             const emptyIndex = gridState.indexOf(null);
             if (emptyIndex !== -1) placeItemInCell(dragging.item, null, emptyIndex);
         }
     });
+
+    // Block stray external file drops anywhere else on the page so the browser
+    // doesn't navigate to the file. The upload area's own handlers still win
+    // via event bubbling.
+    window.addEventListener("dragover", (e) => e.preventDefault());
+    window.addEventListener("drop",     (e) => e.preventDefault());
 
     // --- Init ---
     for (let i = 0; i < totalCells; i++) gridContainer.appendChild(createCell(i));

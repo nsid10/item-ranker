@@ -279,6 +279,12 @@ document.addEventListener("DOMContentLoaded", () => {
     uploadArea.addEventListener("dragleave",(e) => { if (!uploadArea.contains(e.relatedTarget)) uploadArea.classList.remove("drag-over"); });
     uploadArea.addEventListener("drop",     (e) => { e.preventDefault(); uploadArea.classList.remove("drag-over"); addImages(e.dataTransfer.files); });
 
+    // Block stray external file drops anywhere else on the page so the browser
+    // doesn't navigate to the file. The upload area's own handlers still win
+    // via event bubbling.
+    window.addEventListener("dragover", (e) => e.preventDefault());
+    window.addEventListener("drop",     (e) => e.preventDefault());
+
     startBtn.addEventListener("click", () => {
         tournament = new Tournament(uploadedItems);
         uploadPhase.classList.add("hidden");

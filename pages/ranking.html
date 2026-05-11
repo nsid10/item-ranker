@@ -9,26 +9,31 @@
         <link rel="stylesheet" href="../css/ranking.css" />
     </head>
     <body>
-        <nav class="nav-container">
-            <button class="nav-btn" onclick="window.location.href='../index.html'" title="Grid">
-                <i class="uil uil-apps"></i>
-                <span>Grid</span>
-            </button>
-            <button class="nav-btn" onclick="window.location.href='./tierlist.html'" title="Tier List">
-                <i class="uil uil-list-ul"></i>
-                <span>Tier List</span>
-            </button>
-            <button class="nav-btn" onclick="window.location.href='./bracket.html'" title="Bracket">
-                <i class="uil uil-trophy"></i>
-                <span>Bracket</span>
-            </button>
-        </nav>
+        <header class="top-nav">
+            <nav class="nav-container">
+                <button class="nav-btn" onclick="window.location.href='../index.html'" title="Grid">
+                    <i class="uil uil-apps"></i>
+                    <span>Grid</span>
+                </button>
+                <button class="nav-btn" onclick="window.location.href='./tierlist.html'" title="Tier List">
+                    <i class="uil uil-list-ul"></i>
+                    <span>Tier List</span>
+                </button>
+                <button class="nav-btn" onclick="window.location.href='./bracket.html'" title="Bracket">
+                    <i class="uil uil-trophy"></i>
+                    <span>Bracket</span>
+                </button>
+            </nav>
 
-        <div class="controls-container">
-            <button id="theme-toggle" title="Toggle Theme">
-                <i class="uil uil-moon"></i>
-            </button>
-        </div>
+            <div class="controls-container">
+                <button id="aspect-toggle" title="Aspect Ratio">
+                    <i class="uil uil-crop-alt"></i>
+                </button>
+                <button id="theme-toggle" title="Toggle Theme">
+                    <i class="uil uil-moon"></i>
+                </button>
+            </div>
+        </header>
 
         <div id="ranking-ui">
             <p id="match-phase"></p>
@@ -50,6 +55,8 @@
 
         <script src="../js/state.js"></script>
         <script src="../js/theme.js"></script>
+        <script src="../js/aspect.js"></script>
+        <script src="../js/nav.js"></script>
         <script src="../js/engine.js"></script>
         <script src="../js/matchup.js"></script>
     </body>

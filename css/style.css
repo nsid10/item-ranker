@@ -48,6 +48,7 @@ body {
     background-color: var(--bg-color);
     color: var(--header-color); /* Default text color for the body */
     margin: 0;
+    padding-top: 60px; /* clear fixed top nav */
     transition:
         background-color 0.2s,
         color 0.2s; /* Smooth theme transition */
@@ -55,7 +56,7 @@ body {
 
 h1 {
     color: var(--header-color);
-    margin-top: 80px;
+    margin-top: 30px;
     margin-bottom: 30px;
     text-align: center;
 }
@@ -70,14 +71,31 @@ h1 {
     border-radius: 8px;
 }
 
+/* --- TOP NAV BAR --- */
+.top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    padding: 8px 20px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--bg-color);
+    z-index: 100;
+    transition: box-shadow 0.2s;
+}
+
+.top-nav.scrolled {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
 /* --- CONTROLS & BUTTONS --- */
 .controls-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
     display: flex;
     gap: 10px;
-    z-index: 100;
 }
 
 .controls-container button {
@@ -103,12 +121,8 @@ h1 {
 
 /* --- NAV CONTAINER --- */
 .nav-container {
-    position: fixed;
-    top: 20px;
-    left: 20px;
     display: flex;
     gap: 4px;
-    z-index: 100;
 }
 
 .nav-btn {
@@ -149,6 +163,42 @@ h1 {
 .nav-btn.active {
     color: var(--drag-over-outline-color);
     background-color: var(--drag-over-bg-color);
+}
+
+/* --- ASPECT RATIO POPOVER --- */
+.aspect-popover {
+    position: fixed;
+    background-color: var(--bg-color);
+    border: 1px solid var(--button-border-color);
+    border-radius: 8px;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 200;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.aspect-option {
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: var(--button-text-color);
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.15s;
+}
+
+.aspect-option:hover {
+    background-color: var(--button-bg-hover-color);
+}
+
+.aspect-option.active {
+    background-color: var(--drag-over-bg-color);
+    color: var(--drag-over-outline-color);
+    font-weight: 600;
 }
 
 /* --- DOWNLOAD UTILITY --- */

@@ -88,8 +88,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         tier.items.forEach(item => itemsArea.appendChild(buildItemEl(item, tier.id)));
 
-        // Show drag-over only when hovering over empty space (items stop-prop their dragover)
+        // Show drag-over only when an item is being dragged internally — external
+        // files must be added through the upload area below.
         itemsArea.addEventListener("dragover", (e) => {
+            if (!dragging) return;
             e.preventDefault();
             itemsArea.classList.add("drag-over");
         });
@@ -97,13 +99,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!itemsArea.contains(e.relatedTarget)) itemsArea.classList.remove("drag-over");
         });
         itemsArea.addEventListener("drop", (e) => {
+            if (!dragging) return;
             e.preventDefault();
             itemsArea.classList.remove("drag-over");
-            if (e.dataTransfer.files.length > 0) {
-                readFiles(e.dataTransfer.files, item => addItemToTier(item, tier.id));
-            } else if (dragging) {
-                moveItem(dragging.item, dragging.fromTierId, tier.id);
-            }
+            moveItem(dragging.item, dragging.fromTierId, tier.id);
         });
 
         row.appendChild(labelBox);
@@ -293,9 +292,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // --- Unranked pool: accepts item moves from tiers + file drops ---
+    // --- Unranked pool: accepts item moves from tiers only (no file drops) ---
 
     unrankedPool.addEventListener("dragover", (e) => {
+        if (!dragging) return;
         e.preventDefault();
         unrankedPool.classList.add("drag-over");
     });
@@ -303,14 +303,19 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!unrankedPool.contains(e.relatedTarget)) unrankedPool.classList.remove("drag-over");
     });
     unrankedPool.addEventListener("drop", (e) => {
+        if (!dragging) return;
         e.preventDefault();
         unrankedPool.classList.remove("drag-over");
-        if (e.dataTransfer.files.length > 0) {
-            readFiles(e.dataTransfer.files, item => { unranked.push(item); renderUnranked(); });
-        } else if (dragging && dragging.fromTierId !== null) {
+        if (dragging.fromTierId !== null) {
             moveItem(dragging.item, dragging.fromTierId, null);
         }
     });
+
+    // Block stray external file drops anywhere else on the page so the browser
+    // doesn't navigate to the file. The upload area's own handlers still win
+    // via event bubbling.
+    window.addEventListener("dragover", (e) => e.preventDefault());
+    window.addEventListener("drop",     (e) => e.preventDefault());
 
     // --- Tier buttons ---
     addTopBtn.addEventListener("click",    () => addTier("top"));
