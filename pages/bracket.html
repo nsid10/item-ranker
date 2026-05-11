@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
+        <title>Rank Grid — Bracket</title>
+        <link rel="stylesheet" href="../css/style.css" />
+        <link rel="stylesheet" href="../css/bracket.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    </head>
+    <body>
+        <header class="top-nav">
+            <nav class="nav-container">
+                <button class="nav-btn" onclick="window.location.href='../index.html'" title="Grid">
+                    <i class="uil uil-apps"></i>
+                    <span>Grid</span>
+                </button>
+                <button class="nav-btn" onclick="window.location.href='./tierlist.html'" title="Tier List">
+                    <i class="uil uil-list-ul"></i>
+                    <span>Tier List</span>
+                </button>
+                <button class="nav-btn active" onclick="window.location.href='./bracket.html'" title="Bracket">
+                    <i class="uil uil-trophy"></i>
+                    <span>Bracket</span>
+                </button>
+            </nav>
+
+            <div class="controls-container">
+                <button id="aspect-toggle" title="Aspect Ratio">
+                    <i class="uil uil-crop-alt"></i>
+                </button>
+                <button id="theme-toggle" title="Toggle Theme">
+                    <i class="uil uil-moon"></i>
+                </button>
+                <button id="download-btn" title="Download Bracket" disabled>
+                    <i class="uil uil-image-download"></i>
+                </button>
+                <button id="clear-btn" title="Clear Bracket" disabled>
+                    <i class="uil uil-trash-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Phase 1: Upload -->
+        <div id="upload-phase">
+            <h1>Bracket</h1>
+            <div id="upload-area">
+                <i class="uil uil-cloud-upload"></i>
+                <p>Drop images here or <label for="file-input">browse</label></p>
+                <p class="upload-hint">8 – 512 images</p>
+                <input type="file" id="file-input" accept="image/*" multiple hidden />
+            </div>
+            <p id="upload-count" class="hidden"></p>
+            <div id="preview-grid"></div>
+            <button id="start-btn" class="tourn-primary-btn" disabled>
+                <i class="uil uil-play"></i> Start Bracket
+            </button>
+        </div>
+
+        <!-- Phase 2: Match + inline bracket -->
+        <div id="match-phase" class="hidden">
+            <div id="vs-ui">
+                <p id="round-label"></p>
+                <p id="match-label"></p>
+                <p class="pick-hint">Click the winner</p>
+                <div id="match-container">
+                    <div class="match-side" id="side-a">
+                        <img id="img-a" alt="Option A" />
+                    </div>
+                    <div id="vs-label">VS</div>
+                    <div class="match-side" id="side-b">
+                        <img id="img-b" alt="Option B" />
+                    </div>
+                </div>
+            </div>
+            <div id="done-banner" class="hidden">
+                <button id="new-bracket-btn" class="tourn-primary-btn">
+                    <i class="uil uil-redo"></i> New Bracket
+                </button>
+            </div>
+            <div id="bracket-section">
+                <div id="bracket-scroll">
+                    <div id="bracket-view"></div>
+                </div>
+            </div>
+        </div>
+
+        <script src="../js/state.js"></script>
+        <script src="../js/theme.js"></script>
+        <script src="../js/aspect.js"></script>
+        <script src="../js/nav.js"></script>
+        <script src="../js/bracket.js"></script>
+    </body>
+</html>

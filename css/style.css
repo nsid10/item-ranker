@@ -13,6 +13,8 @@
     --drag-over-outline-color: #4a75d1;
     --remove-btn-bg: rgba(0, 0, 0, 0.1);
     --remove-btn-color: #333;
+
+    --img-aspect: 17 / 24;
 }
 
 body.dark-mode {
@@ -46,6 +48,7 @@ body {
     background-color: var(--bg-color);
     color: var(--header-color); /* Default text color for the body */
     margin: 0;
+    padding-top: 60px; /* clear fixed top nav */
     transition:
         background-color 0.2s,
         color 0.2s; /* Smooth theme transition */
@@ -53,49 +56,9 @@ body {
 
 h1 {
     color: var(--header-color);
-    margin-top: 40px;
+    margin-top: 30px;
     margin-bottom: 30px;
     text-align: center;
-}
-
-#grid-container {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 24px;
-    max-width: 2000px;
-    padding: 20px;
-    margin: 0 auto 40px auto;
-}
-
-.grid-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    background-color: var(--cell-bg-color);
-    border-radius: 8px;
-    aspect-ratio: 17 / 24;
-    transition: background-color 0.2s;
-}
-
-.grid-cell img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    aspect-ratio: 17 / 24;
-    order: 1;
-    border-radius: 8px;
-    pointer-events: none;
-}
-
-.cell-number {
-    order: 2;
-    font-size: 14px;
-    color: var(--cell-number-color);
-    margin-top: 4px;
-    margin-block: 4px;
-    font-weight: 700;
-    transition: color 0.2s;
 }
 
 .drag-over {
@@ -108,33 +71,42 @@ h1 {
     border-radius: 8px;
 }
 
+/* --- TOP NAV BAR --- */
+.top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    padding: 8px 20px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--bg-color);
+    z-index: 100;
+    transition: box-shadow 0.2s;
+}
+
+.top-nav.scrolled {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
 /* --- CONTROLS & BUTTONS --- */
 .controls-container {
-    position: absolute;
-    top: 20px;
-    right: 20px;
     display: flex;
     gap: 10px;
 }
 
 .controls-container button {
-    /* Make the button square to fit the icon */
     width: 42px;
     height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    /* Make the icon larger */
     font-size: 20px;
-
-    /* --- EDITED LINES --- */
-    /* Make the button's background transparent */
     background-color: transparent;
-    /* Remove the border */
     border: none;
-
-    /* Original styles that are still needed */
     border-radius: 6px;
     color: var(--button-text-color);
     cursor: pointer;
@@ -147,78 +119,162 @@ h1 {
     background-color: var(--button-bg-hover-color);
 }
 
-/* --- DELETE BUTTON STYLES --- */
-.grid-cell {
-    position: relative; /* Necessary for absolute positioning of the delete icon */
+/* --- NAV CONTAINER --- */
+.nav-container {
+    display: flex;
+    gap: 4px;
 }
 
-.remove-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background-color: var(--remove-btn-bg);
-    color: var(--remove-btn-color);
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: none;
+.nav-btn {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    font-size: 16px;
-    backdrop-filter: blur(4px); /* Adds a modern touch */
-    transition:
-        background-color 0.2s,
-        transform 0.1s;
-}
-
-.remove-btn:hover {
-    background-color: var(--button-bg-hover-color);
-    transform: scale(1.1);
-}
-
-.grid-cell:hover .remove-btn {
-    display: flex;
-}
-
-/* --- ROW CONTROLS --- */
-#row-controls {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 40px;
-}
-
-#row-controls button {
-    width: 42px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
+    gap: 3px;
+    width: 56px;
+    padding: 6px 4px;
     background-color: transparent;
     border: none;
     border-radius: 6px;
-    color: var(--button-text-color);
+    color: var(--cell-number-color);
     cursor: pointer;
     transition:
         background-color 0.2s,
-        color 0.2s,
-        opacity 0.2s;
+        color 0.2s;
 }
 
-#row-controls button:hover:not(:disabled) {
+.nav-btn i {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.nav-btn span {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1;
+}
+
+.nav-btn:hover {
+    background-color: var(--button-bg-hover-color);
+    color: var(--button-text-color);
+}
+
+.nav-btn.active {
+    color: var(--drag-over-outline-color);
+    background-color: var(--drag-over-bg-color);
+}
+
+/* --- ASPECT RATIO POPOVER --- */
+.aspect-popover {
+    position: fixed;
+    background-color: var(--bg-color);
+    border: 1px solid var(--button-border-color);
+    border-radius: 8px;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 200;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.aspect-option {
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: var(--button-text-color);
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.15s;
+}
+
+.aspect-option:hover {
     background-color: var(--button-bg-hover-color);
 }
 
-#row-controls button:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
+.aspect-option.active {
+    background-color: var(--drag-over-bg-color);
+    color: var(--drag-over-outline-color);
+    font-weight: 600;
 }
 
 /* --- DOWNLOAD UTILITY --- */
 .hidden-for-export {
     visibility: hidden !important;
+}
+
+/* --- RANKING CONFIRMATION POPUP --- */
+#rank-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#rank-confirm-modal {
+    background-color: var(--bg-color);
+    border-radius: 12px;
+    padding: 28px 32px;
+    max-width: 380px;
+    width: 90vw;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#rank-confirm-modal h2 {
+    margin: 0;
+    font-size: 20px;
+    color: var(--header-color);
+}
+
+#rank-confirm-modal p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--cell-number-color);
+    line-height: 1.6;
+}
+
+#rank-confirm-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+#rank-confirm-cancel {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--button-border-color);
+    border-radius: 6px;
+    color: var(--cell-number-color);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#rank-confirm-cancel:hover {
+    background-color: var(--button-bg-hover-color);
+}
+
+#rank-confirm-start {
+    padding: 8px 20px;
+    background-color: var(--drag-over-outline-color);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+#rank-confirm-start:hover {
+    opacity: 0.85;
 }

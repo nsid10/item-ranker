@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
+        <title>Rank Grid — Ranking</title>
+        <link rel="stylesheet" href="../css/style.css" />
+        <link rel="stylesheet" href="../css/ranking.css" />
+    </head>
+    <body>
+        <header class="top-nav">
+            <nav class="nav-container">
+                <button class="nav-btn" onclick="window.location.href='../index.html'" title="Grid">
+                    <i class="uil uil-apps"></i>
+                    <span>Grid</span>
+                </button>
+                <button class="nav-btn" onclick="window.location.href='./tierlist.html'" title="Tier List">
+                    <i class="uil uil-list-ul"></i>
+                    <span>Tier List</span>
+                </button>
+                <button class="nav-btn" onclick="window.location.href='./bracket.html'" title="Bracket">
+                    <i class="uil uil-trophy"></i>
+                    <span>Bracket</span>
+                </button>
+            </nav>
+
+            <div class="controls-container">
+                <button id="aspect-toggle" title="Aspect Ratio">
+                    <i class="uil uil-crop-alt"></i>
+                </button>
+                <button id="theme-toggle" title="Toggle Theme">
+                    <i class="uil uil-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <div id="ranking-ui">
+            <p id="match-phase"></p>
+            <p id="match-progress">
+                Match <span id="match-num">1</span> / ~<span id="match-est">?</span>
+            </p>
+            <p class="pick-hint">Click the better item</p>
+            <div id="match-container">
+                <div class="match-side" id="side-a">
+                    <img id="img-a" alt="Option A" />
+                </div>
+                <div id="vs-label">VS</div>
+                <div class="match-side" id="side-b">
+                    <img id="img-b" alt="Option B" />
+                </div>
+            </div>
+            <button id="end-early-btn">End Early &amp; Use Current Rankings</button>
+        </div>
+
+        <script src="../js/state.js"></script>
+        <script src="../js/theme.js"></script>
+        <script src="../js/aspect.js"></script>
+        <script src="../js/nav.js"></script>
+        <script src="../js/engine.js"></script>
+        <script src="../js/matchup.js"></script>
+    </body>
+</html>
