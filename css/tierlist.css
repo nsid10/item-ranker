@@ -277,6 +277,7 @@
 
 /* --- UNRANKED ITEMS (small thumbnails, fixed width) --- */
 #unranked-pool .tier-item {
+    position: relative;
     width: 88px;
     aspect-ratio: var(--img-aspect);
     flex-shrink: 0;
