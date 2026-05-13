@@ -236,7 +236,7 @@
 /* --- UNRANKED SIDEBAR (right column) --- */
 #unranked-section {
     flex-shrink: 0;
-    width: 280px;
+    width: 400px;
     position: sticky;
     top: 76px; /* below 60px fixed nav + breathing room */
     align-self: flex-start;
