@@ -165,38 +165,64 @@ h1 {
     background-color: var(--drag-over-bg-color);
 }
 
-/* --- ASPECT RATIO POPOVER --- */
-.aspect-popover {
+/* --- OPTIONS POPOVER --- */
+.options-popover {
     position: fixed;
     background-color: var(--bg-color);
     border: 1px solid var(--button-border-color);
     border-radius: 8px;
-    padding: 4px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 10px;
+    min-width: 220px;
     z-index: 200;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.aspect-option {
-    padding: 8px 16px;
-    background: transparent;
-    border: none;
-    border-radius: 4px;
-    color: var(--button-text-color);
-    font-size: 13px;
-    cursor: pointer;
-    text-align: left;
-    transition: background-color 0.15s;
+.options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
-.aspect-option:hover {
+.options-heading {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--cell-number-color);
+}
+
+.options-row {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.options-option {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 10px;
+    background: transparent;
+    border: 1px solid var(--button-border-color);
+    border-radius: 4px;
+    color: var(--button-text-color);
+    font-size: 12px;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.options-option:hover {
     background-color: var(--button-bg-hover-color);
 }
 
-.aspect-option.active {
+.options-option.active {
     background-color: var(--drag-over-bg-color);
+    border-color: var(--drag-over-outline-color);
     color: var(--drag-over-outline-color);
     font-weight: 600;
 }

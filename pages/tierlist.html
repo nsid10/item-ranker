@@ -30,9 +30,6 @@
                 <button id="rank-btn" title="Start Ranking">
                     <i class="uil uil-arrow-random"></i>
                 </button>
-                <button id="aspect-toggle" title="Aspect Ratio">
-                    <i class="uil uil-crop-alt"></i>
-                </button>
                 <button id="theme-toggle" title="Toggle Theme">
                     <i class="uil uil-moon"></i>
                 </button>
@@ -42,34 +39,39 @@
                 <button id="clear-btn" title="Clear All Tiers">
                     <i class="uil uil-trash-alt"></i>
                 </button>
+                <button id="options-toggle" title="Options">
+                    <i class="uil uil-setting"></i>
+                </button>
             </div>
         </header>
 
         <h1>My Tier List</h1>
 
-        <div id="tierlist-main">
-            <button class="add-tier-btn" id="add-top-btn">
-                <i class="uil uil-plus"></i> Add Tier
-            </button>
-            <div id="tier-container"></div>
-            <button class="add-tier-btn" id="add-bottom-btn">
-                <i class="uil uil-plus"></i> Add Tier
-            </button>
-        </div>
-
-        <div id="unranked-section">
-            <p class="unranked-title">Unranked</p>
-            <div id="unranked-pool"></div>
-            <div id="upload-area">
-                <i class="uil uil-cloud-upload"></i>
-                <p>Drop images here or <label for="file-input">browse</label></p>
-                <input type="file" id="file-input" accept="image/*" multiple hidden />
+        <div id="tierlist-layout">
+            <div id="tierlist-main">
+                <button class="add-tier-btn" id="add-top-btn">
+                    <i class="uil uil-plus"></i> Add Tier
+                </button>
+                <div id="tier-container"></div>
+                <button class="add-tier-btn" id="add-bottom-btn">
+                    <i class="uil uil-plus"></i> Add Tier
+                </button>
             </div>
+
+            <aside id="unranked-section">
+                <p class="unranked-title">Unranked</p>
+                <div id="unranked-pool"></div>
+                <div id="upload-area">
+                    <i class="uil uil-cloud-upload"></i>
+                    <p>Drop images here or <label for="file-input">browse</label></p>
+                    <input type="file" id="file-input" accept="image/*" multiple hidden />
+                </div>
+            </aside>
         </div>
 
         <script src="../js/state.js"></script>
         <script src="../js/theme.js"></script>
-        <script src="../js/aspect.js"></script>
+        <script src="../js/options.js"></script>
         <script src="../js/nav.js"></script>
         <script src="../js/engine.js"></script>
         <script src="../js/tierlist.js"></script>

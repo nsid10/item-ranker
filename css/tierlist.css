@@ -1,8 +1,20 @@
-/* --- LAYOUT --- */
-#tierlist-main {
+/* --- PAGE LAYOUT (tier list left, unranked sidebar right) --- */
+#tierlist-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
     max-width: 1600px;
     margin: 0 auto;
     padding: 0 20px;
+}
+
+[data-size="small"]  #tierlist-layout { max-width: 1300px; }
+[data-size="medium"] #tierlist-layout { max-width: 1600px; }
+[data-size="large"]  #tierlist-layout { max-width: 1900px; }
+
+#tierlist-main {
+    flex: 1;
+    min-width: 0;
 }
 
 /* --- ADD TIER BUTTONS --- */
@@ -41,12 +53,17 @@
     gap: 3px;
 }
 
+/* Row has no fixed height — it grows as items wrap to additional rows.
+   The min-height keeps an empty tier visually substantial. */
 .tier-row {
     display: flex;
-    height: 140px;
+    min-height: 140px;
     border-radius: 4px;
-    overflow: hidden;
 }
+
+[data-size="small"]  .tier-row { min-height: 104px; }
+[data-size="medium"] .tier-row { min-height: 140px; }
+[data-size="large"]  .tier-row { min-height: 180px; }
 
 /* --- TIER LABEL COLORS (positional) --- */
 .tier-row:nth-child(1)  .tier-label { background-color: #FF7F7F; }
@@ -70,6 +87,8 @@
     justify-content: center;
     position: relative;
     padding: 8px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
 }
 
 .tier-label-text {
@@ -126,16 +145,18 @@
     opacity: 0 !important;
 }
 
-/* --- TIER ITEMS AREA --- */
+/* --- TIER ITEMS AREA: exactly 10 columns, grows vertically by row --- */
 .tier-items {
     flex: 1;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    align-content: start;
     gap: 4px;
-    padding: 0;
+    padding: 4px;
     background-color: var(--cell-bg-color);
-    overflow: hidden;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
     transition: background-color 0.15s;
 }
 
@@ -145,28 +166,27 @@
     outline-offset: -2px;
 }
 
-/* --- ITEMS --- */
-.tier-item {
+/* --- TIER ITEMS (inside a tier row) ---
+   Cell width comes from the 10-col grid; height derives from aspect-ratio. */
+.tier-items .tier-item {
     position: relative;
-    height: 136px;
-    flex-shrink: 0;
-    cursor: grab;
-    padding: 2px;
-}
-
-.tier-item:active {
-    cursor: grabbing;
-}
-
-.tier-item img {
-    height: 100%;
-    width: auto;
+    width: 100%;
     aspect-ratio: var(--img-aspect);
+    cursor: grab;
+}
+
+.tier-items .tier-item img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     border-radius: 4px;
     display: block;
     pointer-events: none;
     user-select: none;
+}
+
+.tier-item:active {
+    cursor: grabbing;
 }
 
 .tier-item.dragging {
@@ -186,8 +206,8 @@
     z-index: 5;
 }
 
-.tier-item.insert-before::before { left: -2px; }
-.tier-item.insert-after::after   { right: -2px; }
+.tier-item.insert-before::before { left: -3px; }
+.tier-item.insert-after::after   { right: -3px; }
 
 .item-remove-btn {
     position: absolute;
@@ -213,25 +233,34 @@
     display: flex;
 }
 
-/* --- UNRANKED SECTION --- */
+/* --- UNRANKED SIDEBAR (right column) --- */
 #unranked-section {
-    max-width: 1600px;
-    margin: 24px auto 48px;
-    padding: 0 20px;
-    border-top: 1px solid var(--button-border-color);
-    padding-top: 20px;
+    flex-shrink: 0;
+    width: 280px;
+    position: sticky;
+    top: 76px; /* below 60px fixed nav + breathing room */
+    align-self: flex-start;
+    max-height: calc(100vh - 92px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-left: 1px solid var(--button-border-color);
+    padding-left: 16px;
 }
 
 .unranked-title {
     font-size: 15px;
     font-weight: 700;
     color: var(--header-color);
-    margin: 0 0 12px;
+    margin: 0;
 }
 
 #unranked-pool {
+    flex: 1;
+    overflow-y: auto;
     display: flex;
     flex-wrap: wrap;
+    align-content: flex-start;
     gap: 8px;
     min-height: 80px;
     padding: 8px;
@@ -239,7 +268,6 @@
     background-color: var(--cell-bg-color);
     border: 2px dashed transparent;
     transition: border-color 0.15s, background-color 0.15s;
-    margin-bottom: 12px;
 }
 
 #unranked-pool.drag-over {
@@ -247,8 +275,27 @@
     background-color: var(--drag-over-bg-color);
 }
 
-/* --- UPLOAD AREA (matches ranking engine style) --- */
+/* --- UNRANKED ITEMS (small thumbnails, fixed width) --- */
+#unranked-pool .tier-item {
+    width: 88px;
+    aspect-ratio: var(--img-aspect);
+    flex-shrink: 0;
+    cursor: grab;
+}
+
+#unranked-pool .tier-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* --- UPLOAD AREA --- */
 #upload-area {
+    flex-shrink: 0;
     border: 2px dashed var(--button-border-color);
     border-radius: 12px;
     display: flex;
@@ -256,7 +303,7 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 24px 20px;
+    padding: 16px 12px;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
 }
@@ -268,14 +315,15 @@
 }
 
 #upload-area .uil-cloud-upload {
-    font-size: 36px;
+    font-size: 32px;
     color: var(--cell-number-color);
 }
 
 #upload-area p {
     margin: 0;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--cell-number-color);
+    text-align: center;
 }
 
 #upload-area label {

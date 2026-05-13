@@ -8,6 +8,10 @@
     margin: 0 auto 40px auto;
 }
 
+[data-size="small"]  #grid-container { grid-template-columns: repeat(14, 1fr); gap: 16px; }
+[data-size="medium"] #grid-container { grid-template-columns: repeat(10, 1fr); gap: 24px; }
+[data-size="large"]  #grid-container { grid-template-columns: repeat(7,  1fr); gap: 28px; }
+
 /* --- GRID CELLS --- */
 .grid-cell {
     display: flex;
